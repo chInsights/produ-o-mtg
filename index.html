@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PCP MTG FAB. | Painel de Acompanhamento de Produção</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <!-- Firebase SDK Compat (não bloqueia a página) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -128,6 +127,7 @@
       outline: none;
     }
 
+    /* Upload Zone */
     .upload-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
@@ -136,6 +136,7 @@
     }
 
     .upload-card {
+      position: relative;
       background: var(--bg-card);
       border: 1.5px dashed var(--border-strong);
       border-radius: 14px;
@@ -147,9 +148,10 @@
       cursor: pointer;
       box-shadow: var(--shadow-sm);
       transition: all 0.2s ease;
+      user-select: none;
     }
 
-    .upload-card:hover {
+    .upload-card:hover, .upload-card.dragover {
       border-color: var(--accent);
       background: var(--accent-soft);
     }
@@ -158,6 +160,15 @@
       border-style: solid;
       border-color: var(--success);
       background: #f0fdf4;
+    }
+
+    .file-input-invisible {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
     }
 
     .upload-info h3 { font-size: 0.93rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
@@ -462,25 +473,25 @@
   </header>
 
   <section class="upload-grid">
-    <label class="upload-card" id="cardPlano">
+    <div class="upload-card" id="cardPlano" onclick="abrirSeletor('inputPlano')">
       <div class="upload-info">
         <h3>1. Plano de Produção (Aba MONTAGEM)</h3>
-        <p id="planoFileName">Clique para selecionar a planilha do plano (.xlsx)</p>
+        <p id="planoFileName">Clique ou arraste a planilha do plano (.xlsx)</p>
         <div class="upload-meta" id="planoCloudMeta">Pronto para importar</div>
       </div>
       <span class="upload-status" id="planoStatus">Selecionar</span>
-      <input type="file" id="inputPlano" accept=".xlsx,.xls,.csv" hidden />
-    </label>
+      <input type="file" id="inputPlano" class="file-input-invisible" accept=".xlsx,.xls,.csv" />
+    </div>
 
-    <label class="upload-card" id="cardSap">
+    <div class="upload-card" id="cardSap" onclick="abrirSeletor('inputSap')">
       <div class="upload-info">
         <h3>2. Relatório SAP (COOIS / GMEIN)</h3>
-        <p id="sapFileName">Clique para selecionar a extração do SAP (.xlsx)</p>
+        <p id="sapFileName">Clique ou arraste a extração do SAP (.xlsx)</p>
         <div class="upload-meta" id="sapCloudMeta">Pronto para importar</div>
       </div>
       <span class="upload-status" id="sapStatus">Selecionar</span>
-      <input type="file" id="inputSap" accept=".xlsx,.xls,.csv" hidden />
-    </label>
+      <input type="file" id="inputSap" class="file-input-invisible" accept=".xlsx,.xls,.csv" />
+    </div>
   </section>
 
   <section class="kpi-grid">
