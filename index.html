@@ -44,7 +44,6 @@
       padding: 22px 28px;
     }
 
-    /* Header */
     .topbar {
       display: flex;
       justify-content: space-between;
@@ -126,7 +125,6 @@
       outline: none;
     }
 
-    /* Upload Zone */
     .upload-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
@@ -180,7 +178,6 @@
       border-color: var(--success-border);
     }
 
-    /* KPIs */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
@@ -200,7 +197,6 @@
     .kpi-value { font-size: 1.55rem; font-weight: 800; margin: 6px 0 4px; color: var(--text-main); }
     .kpi-sub { font-size: 0.77rem; color: var(--text-muted); font-weight: 500; line-height: 1.35; }
 
-    /* Search Bar Destacada */
     .search-panel {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -283,7 +279,6 @@
       padding: 0 4px;
     }
 
-    /* Toolbar & Export Bar */
     .toolbar {
       display: flex;
       justify-content: space-between;
@@ -320,11 +315,7 @@
     }
 
     .tab-btn:hover { background: var(--bg-base); color: var(--text-main); }
-
-    .tab-btn.active {
-      background: var(--accent);
-      color: #ffffff;
-    }
+    .tab-btn.active { background: var(--accent); color: #ffffff; }
 
     .tab-count {
       background: rgba(15, 23, 42, 0.08);
@@ -333,11 +324,7 @@
       font-size: 0.72rem;
       font-weight: 700;
     }
-
-    .tab-btn.active .tab-count {
-      background: rgba(255, 255, 255, 0.22);
-      color: #fff;
-    }
+    .tab-btn.active .tab-count { background: rgba(255, 255, 255, 0.22); color: #fff; }
 
     .export-group {
       display: flex;
@@ -360,18 +347,10 @@
       box-shadow: var(--shadow-sm);
     }
 
-    .btn-export-pending {
-      background: var(--warning-bg);
-      color: #92400e;
-      border-color: var(--warning-border);
-    }
+    .btn-export-pending { background: var(--warning-bg); color: #92400e; border-color: var(--warning-border); }
     .btn-export-pending:hover { background: #fef3c7; }
 
-    .btn-export-done {
-      background: var(--success-bg);
-      color: #065f46;
-      border-color: var(--success-border);
-    }
+    .btn-export-done { background: var(--success-bg); color: #065f46; border-color: var(--success-border); }
     .btn-export-done:hover { background: #d1fae5; }
 
     .btn-copy-sap {
@@ -389,7 +368,6 @@
     }
     .btn-copy-sap:hover { background: #1d4ed8; }
 
-    /* Table */
     .table-wrap {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -472,7 +450,7 @@
       <p>Cruzamento Plano Mensal (MONTAGEM) × Apontamento SAP (COOIS)</p>
     </div>
     <div class="controls-top">
-      <div class="cloud-badge" id="cloudBadge">☁️ Conectando ao Firebase...</div>
+      <div class="cloud-badge" id="cloudBadge">☁️ Conectando...</div>
       <div class="date-box">
         <span>Data Base:</span>
         <input type="date" id="refDateInput" />
@@ -484,25 +462,24 @@
     <label class="upload-card" id="cardPlano">
       <div class="upload-info">
         <h3>1. Plano de Produção (Aba MONTAGEM)</h3>
-        <p id="planoFileName">Clique para atualizar o plano na nuvem (.xlsx)</p>
-        <div class="upload-meta" id="planoCloudMeta">Aguardando sincronização com a nuvem...</div>
+        <p id="planoFileName">Clique para selecionar a planilha do plano (.xlsx)</p>
+        <div class="upload-meta" id="planoCloudMeta">Pronto para importar</div>
       </div>
-      <span class="upload-status" id="planoStatus">Nuvem</span>
+      <span class="upload-status" id="planoStatus">Selecionar</span>
       <input type="file" id="inputPlano" accept=".xlsx,.xls,.csv" hidden />
     </label>
 
     <label class="upload-card" id="cardSap">
       <div class="upload-info">
         <h3>2. Relatório SAP (COOIS / GMEIN)</h3>
-        <p id="sapFileName">Clique para alimentar apontamentos do SAP (.xlsx)</p>
-        <div class="upload-meta" id="sapCloudMeta">Aguardando sincronização com a nuvem...</div>
+        <p id="sapFileName">Clique para selecionar a extração do SAP (.xlsx)</p>
+        <div class="upload-meta" id="sapCloudMeta">Pronto para importar</div>
       </div>
-      <span class="upload-status" id="sapStatus">Nuvem</span>
+      <span class="upload-status" id="sapStatus">Selecionar</span>
       <input type="file" id="inputSap" accept=".xlsx,.xls,.csv" hidden />
     </label>
   </section>
 
-  <!-- KPIs Gerenciais com Caixas, Dúzias e Horas -->
   <section class="kpi-grid">
     <div class="kpi-card">
       <div class="kpi-label">Total Programado (Caixas)</div>
@@ -536,11 +513,10 @@
     </div>
   </section>
 
-  <!-- Campo de Pesquisa e Filtros de Bloco/Classe -->
   <section class="search-panel">
     <div class="search-box">
       <span style="font-size: 1rem;">🔍</span>
-      <input type="text" id="searchInput" placeholder="Pesquisar por Ordem (Wo), Artigo (SKU), Demanda ou Descrição... (separe por vírgula para buscar vários)" />
+      <input type="text" id="searchInput" placeholder="Pesquisar por Ordem (Wo), Artigo (SKU), Demanda ou Descrição... (separe por vírgula)" />
       <button class="btn-clear-search" id="btnClearSearch" onclick="limparBusca()">Limpar ✕</button>
     </div>
     <div class="search-actions">
@@ -595,7 +571,7 @@
       <tbody id="tableBody">
         <tr>
           <td colspan="11" class="empty-state">
-            Carregando dados da nuvem ou aguardando importação das planilhas...
+            Importe a planilha do <strong>Plano de Produção</strong> e o <strong>Relatório SAP</strong> acima para iniciar o cruzamento.
           </td>
         </tr>
       </tbody>
@@ -604,7 +580,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD8xIc7gLsG_u2E4GjZ1a9lA2_zUsvbs04",
@@ -652,75 +628,9 @@
       });
     });
 
-    function initFirebase() {
-      const badge = document.getElementById('cloudBadge');
-      try {
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        badge.className = "cloud-badge online";
-        badge.textContent = "☁️ Nuvem Conectada";
-
-        onSnapshot(doc(db, COLLECTION_NAME, "plano_atual"), (snap) => {
-          if (snap.exists()) {
-            const data = snap.data();
-            rawPlanoRows = data.rows || [];
-            const totalCx = rawPlanoRows.reduce((acc, r) => acc + r.qtd, 0);
-            document.getElementById('cardPlano').classList.add('loaded');
-            document.getElementById('planoFileName').textContent = `${data.fileName || 'Plano Salvo'} (${rawPlanoRows.length} linhas • ${totalCx.toLocaleString('pt-BR')} cx)`;
-            document.getElementById('planoCloudMeta').textContent = `☁️ Salvo na nuvem em ${data.updatedAt || '-'}`;
-            document.getElementById('planoStatus').textContent = 'Na Nuvem ✓';
-            processAndRender();
-          } else {
-            document.getElementById('planoCloudMeta').textContent = "Nenhum plano salvo na nuvem ainda. Faça o 1º upload.";
-          }
-        }, (err) => {
-          console.error("Erro ao ler plano do Firebase:", err);
-          badge.className = "cloud-badge offline";
-          badge.textContent = "⚠️ Erro de permissão no Firestore";
-        });
-
-        onSnapshot(doc(db, COLLECTION_NAME, "sap_atual"), (snap) => {
-          if (snap.exists()) {
-            const data = snap.data();
-            const entries = data.entries || {};
-            sapMap = new Map(Object.entries(entries));
-            document.getElementById('cardSap').classList.add('loaded');
-            document.getElementById('sapFileName').textContent = `${data.fileName || 'Extração SAP'} (${sapMap.size} ordens SAP)`;
-            document.getElementById('sapCloudMeta').textContent = `☁️ Atualizado na nuvem em ${data.updatedAt || '-'}`;
-            document.getElementById('sapStatus').textContent = 'Na Nuvem ✓';
-            processAndRender();
-          } else {
-            document.getElementById('sapCloudMeta').textContent = "Nenhuma extração SAP salva na nuvem ainda.";
-          }
-        });
-      } catch (e) {
-        console.error("Falha ao iniciar Firebase:", e);
-        badge.className = "cloud-badge offline";
-        badge.textContent = "⚠️ Erro ao conectar Firebase";
-      }
-    }
-
-    async function saveToCloud(docId, payload, metaElementId) {
-      if (!db) return;
-      const badge = document.getElementById('cloudBadge');
-      badge.className = "cloud-badge syncing";
-      badge.textContent = "🔄 Salvando na nuvem...";
-      try {
-        await setDoc(doc(db, COLLECTION_NAME, docId), payload);
-        badge.className = "cloud-badge online";
-        badge.textContent = "☁️ Nuvem Sincronizada";
-      } catch (err) {
-        console.error("Erro ao salvar no Firestore:", err);
-        badge.className = "cloud-badge offline";
-        badge.textContent = "⚠️ Falha ao salvar na nuvem";
-        document.getElementById(metaElementId).textContent = "Erro ao gravar no Firestore (verifique as regras do banco).";
-      }
-    }
-
-    function getNowBR() {
-      return new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
-    }
-
+    // =========================================================================
+    // PARSERS DE EXCEL (100% INDEPENDENTES DA NUVEM)
+    // =========================================================================
     function parseExcelDate(val) {
       if (!val) return null;
       if (typeof val === 'number' && val > 20000) {
@@ -774,174 +684,304 @@
       return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
     }
 
-    // 1. Upload e Salvamento do Plano (Aba MONTAGEM)
+    function getNowBR() {
+      return new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    }
+
+    // 1. Leitura imediata do Plano (Aba MONTAGEM)
     document.getElementById('inputPlano').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
+      document.getElementById('planoStatus').textContent = 'Lendo...';
       const reader = new FileReader();
       reader.onload = async (evt) => {
-        const wb = XLSX.read(evt.target.result, { type: 'array' });
-        const sheetName = wb.SheetNames.find(n => n.toUpperCase().includes('MONTAGEM')) || wb.SheetNames[0];
-        const ws = wb.Sheets[sheetName];
-        const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        try {
+          const wb = XLSX.read(evt.target.result, { type: 'array' });
+          const sheetName = wb.SheetNames.find(n => n.toUpperCase().includes('MONTAGEM')) || wb.SheetNames[0];
+          const ws = wb.Sheets[sheetName];
+          const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-        let headerIdx = matrix.findIndex(row =>
-          row.some(cell => normalizeKey(cell) === 'wo') &&
-          row.some(cell => normalizeKey(cell) === 'item')
-        );
+          let headerIdx = matrix.findIndex(row =>
+            row.some(cell => normalizeKey(cell) === 'wo') &&
+            row.some(cell => normalizeKey(cell) === 'item')
+          );
 
-        if (headerIdx === -1) {
-          alert('Não encontrei as colunas "Wo" e "Item" na aba ' + sheetName);
-          return;
-        }
-
-        const headers = matrix[headerIdx].map(h => normalizeKey(h));
-        const col = {
-          linha: headers.findIndex(h => h === 'linha'),
-          data: headers.findIndex(h => h === 'data'),
-          area: headers.findIndex(h => h === 'area'),
-          wo: headers.findIndex(h => h === 'wo'),
-          cxh: headers.findIndex(h => h.includes('cx/h')),
-          etq: headers.findIndex(h => h.includes('etiquetagem')),
-          item: headers.findIndex(h => h === 'item'),
-          obs: headers.findIndex(h => h.includes('observa')),
-          qtd: headers.findIndex(h => h === 'qtd'),
-          classe: headers.findIndex(h => h.includes('class')),
-          cliente: headers.findIndex(h => h.includes('cliente')),
-          horas: headers.findIndex(h => h === 'horas' || h.includes('horas')),
-          demandas: headers.findIndex(h => h.includes('demanda')),
-          duzias: headers.findIndex(h => h.includes('duzia'))
-        };
-
-        const parsedRows = [];
-        let blocoAtual = 'OFICIAL';
-
-        for (let i = headerIdx + 1; i < matrix.length; i++) {
-          const r = matrix[i];
-          const colA = normalizeKey(r[col.linha >= 0 ? col.linha : 0]);
-
-          if (colA.includes('considerar')) {
-            blocoAtual = 'CONSIDERAR';
-            continue;
+          if (headerIdx === -1) {
+            alert('Não encontrei as colunas "Wo" e "Item" na aba ' + sheetName);
+            document.getElementById('planoStatus').textContent = 'Erro';
+            return;
           }
 
-          let wo = String(r[col.wo] || '').trim();
-          if (wo === '-' || wo === '0') wo = '';
+          const headers = matrix[headerIdx].map(h => normalizeKey(h));
+          const col = {
+            linha: headers.findIndex(h => h === 'linha'),
+            data: headers.findIndex(h => h === 'data'),
+            wo: headers.findIndex(h => h === 'wo'),
+            item: headers.findIndex(h => h === 'item'),
+            obs: headers.findIndex(h => h.includes('observa')),
+            qtd: headers.findIndex(h => h === 'qtd'),
+            classe: headers.findIndex(h => h.includes('class')),
+            cliente: headers.findIndex(h => h.includes('cliente')),
+            horas: headers.findIndex(h => h === 'horas' || h.includes('horas')),
+            demandas: headers.findIndex(h => h.includes('demanda')),
+            duzias: headers.findIndex(h => h.includes('duzia'))
+          };
 
-          const item = String(r[col.item] || '').trim();
-          const qtd = parseNumber(r[col.qtd]);
-          const horas = col.horas >= 0 ? parseNumber(r[col.horas]) : 0;
-          const duzias = col.duzias >= 0 ? parseNumber(r[col.duzias]) : 0;
-          const dataIso = parseExcelDate(r[col.data]) || 'SEM_DATA';
+          const parsedRows = [];
+          let blocoAtual = 'OFICIAL';
 
-          if (!item || qtd <= 0) continue;
+          for (let i = headerIdx + 1; i < matrix.length; i++) {
+            const r = matrix[i];
+            const colA = normalizeKey(r[col.linha >= 0 ? col.linha : 0]);
 
-          parsedRows.push({
-            rowIndex: i + 1,
-            bloco: blocoAtual,
-            wo,
-            item,
-            dataIso,
-            area: String(r[col.area] || '').trim(),
-            cxh: parseNumber(r[col.cxh]),
-            etq: String(r[col.etq] || '').trim(),
-            obs: String(r[col.obs] || '').trim(),
-            qtd,
-            horas,
-            duzias,
-            classe: String(r[col.classe] || '').trim(),
-            cliente: String(r[col.cliente] || '').trim(),
-            demanda: col.demandas >= 0 ? String(r[col.demandas] || '').trim() : ''
-          });
+            if (colA.includes('considerar')) {
+              blocoAtual = 'CONSIDERAR';
+              continue;
+            }
+
+            let wo = String(r[col.wo] || '').trim();
+            if (wo === '-' || wo === '0') wo = '';
+
+            const item = String(r[col.item] || '').trim();
+            const qtd = parseNumber(r[col.qtd]);
+            const horas = col.horas >= 0 ? parseNumber(r[col.horas]) : 0;
+            const duzias = col.duzias >= 0 ? parseNumber(r[col.duzias]) : 0;
+            const dataIso = parseExcelDate(r[col.data]) || 'SEM_DATA';
+
+            if (!item || qtd <= 0) continue;
+
+            parsedRows.push({
+              rowIndex: i + 1,
+              bloco: blocoAtual,
+              wo,
+              item,
+              dataIso,
+              obs: String(r[col.obs] || '').trim(),
+              qtd,
+              horas,
+              duzias,
+              classe: String(r[col.classe] || '').trim(),
+              cliente: String(r[col.cliente] || '').trim(),
+              demanda: col.demandas >= 0 ? String(r[col.demandas] || '').trim() : ''
+            });
+          }
+
+          rawPlanoRows = parsedRows;
+          const totalCxLido = rawPlanoRows.reduce((acc, r) => acc + r.qtd, 0);
+
+          document.getElementById('cardPlano').classList.add('loaded');
+          document.getElementById('planoFileName').textContent = `${file.name} (${rawPlanoRows.length} linhas • ${totalCxLido.toLocaleString('pt-BR')} cx)`;
+          document.getElementById('planoStatus').textContent = 'Carregado ✓';
+
+          // Renderiza na tela imediatamente
+          processAndRender();
+
+          // Salva na nuvem em segundo plano (dividido em lotes para não passar de 1MB)
+          await savePlanoToCloud(file.name, parsedRows);
+        } catch (err) {
+          console.error(err);
+          alert('Erro ao ler a planilha do Plano: ' + err.message);
+          document.getElementById('planoStatus').textContent = 'Erro';
         }
-
-        rawPlanoRows = parsedRows;
-        const nowStr = getNowBR();
-        const totalCxLido = rawPlanoRows.reduce((acc, r) => acc + r.qtd, 0);
-
-        document.getElementById('cardPlano').classList.add('loaded');
-        document.getElementById('planoFileName').textContent = `${file.name} (${rawPlanoRows.length} linhas • ${totalCxLido.toLocaleString('pt-BR')} cx)`;
-        document.getElementById('planoStatus').textContent = 'Carregado ✓';
-        processAndRender();
-
-        await saveToCloud("plano_atual", {
-          fileName: file.name,
-          updatedAt: nowStr,
-          rows: parsedRows
-        }, "planoCloudMeta");
       };
       reader.readAsArrayBuffer(file);
     });
 
-    // 2. Upload e Salvamento do Relatório SAP
+    // 2. Leitura imediata do Relatório SAP
     document.getElementById('inputSap').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
+      document.getElementById('sapStatus').textContent = 'Lendo...';
       const reader = new FileReader();
       reader.onload = async (evt) => {
-        const wb = XLSX.read(evt.target.result, { type: 'array' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        try {
+          const wb = XLSX.read(evt.target.result, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-        let headerIdx = matrix.findIndex(row =>
-          row.some(cell => normalizeKey(cell) === 'ordem') &&
-          row.some(cell => normalizeKey(cell).includes('boa confirmada'))
-        );
+          let headerIdx = matrix.findIndex(row =>
+            row.some(cell => normalizeKey(cell) === 'ordem') &&
+            row.some(cell => normalizeKey(cell).includes('boa confirmada'))
+          );
 
-        if (headerIdx === -1) {
-          alert('Não encontrei as colunas "Ordem" e "Quantidade boa confirmada" no relatório SAP.');
-          return;
-        }
+          if (headerIdx === -1) {
+            alert('Não encontrei as colunas "Ordem" e "Quantidade boa confirmada" no relatório SAP.');
+            document.getElementById('sapStatus').textContent = 'Erro';
+            return;
+          }
 
-        const headers = matrix[headerIdx].map(h => normalizeKey(h));
-        const col = {
-          ordem: headers.findIndex(h => h === 'ordem'),
-          material: headers.findIndex(h => h === 'material'),
-          desc: headers.findIndex(h => h.includes('texto breve')),
-          qtdOrdem: headers.findIndex(h => h.includes('quantidade da ordem')),
-          qtdBoa: headers.findIndex(h => h.includes('boa confirmada')),
-          conclusao: headers.findIndex(h => h.includes('conclusao'))
-        };
-
-        const newMap = new Map();
-        const plainObj = {};
-
-        for (let i = headerIdx + 1; i < matrix.length; i++) {
-          const r = matrix[i];
-          const ordem = String(r[col.ordem] || '').trim();
-          if (!ordem) continue;
-
-          const entry = {
-            material: String(r[col.material] || '').trim(),
-            desc: String(r[col.desc] || '').trim(),
-            qtdOrdemSap: parseNumber(r[col.qtdOrdem]),
-            qtdBoa: parseNumber(r[col.qtdBoa]),
-            dataConclusao: parseExcelDate(r[col.conclusao])
+          const headers = matrix[headerIdx].map(h => normalizeKey(h));
+          const col = {
+            ordem: headers.findIndex(h => h === 'ordem'),
+            material: headers.findIndex(h => h === 'material'),
+            desc: headers.findIndex(h => h.includes('texto breve')),
+            qtdOrdem: headers.findIndex(h => h.includes('quantidade da ordem')),
+            qtdBoa: headers.findIndex(h => h.includes('boa confirmada'))
           };
-          newMap.set(ordem, entry);
-          plainObj[ordem] = entry;
+
+          const newMap = new Map();
+          const plainObj = {};
+
+          for (let i = headerIdx + 1; i < matrix.length; i++) {
+            const r = matrix[i];
+            const ordem = String(r[col.ordem] || '').trim();
+            if (!ordem) continue;
+
+            const entry = {
+              material: String(r[col.material] || '').trim(),
+              desc: String(r[col.desc] || '').trim(),
+              qtdOrdemSap: parseNumber(r[col.qtdOrdem]),
+              qtdBoa: parseNumber(r[col.qtdBoa])
+            };
+            newMap.set(ordem, entry);
+            plainObj[ordem] = entry;
+          }
+
+          sapMap = newMap;
+
+          document.getElementById('cardSap').classList.add('loaded');
+          document.getElementById('sapFileName').textContent = `${file.name} (${sapMap.size} ordens SAP)`;
+          document.getElementById('sapStatus').textContent = 'Atualizado ✓';
+
+          // Renderiza na tela imediatamente
+          processAndRender();
+
+          // Salva na nuvem em segundo plano
+          await saveSapToCloud(file.name, plainObj);
+        } catch (err) {
+          console.error(err);
+          alert('Erro ao ler o relatório SAP: ' + err.message);
+          document.getElementById('sapStatus').textContent = 'Erro';
         }
-
-        sapMap = newMap;
-        const nowStr = getNowBR();
-
-        document.getElementById('cardSap').classList.add('loaded');
-        document.getElementById('sapFileName').textContent = `${file.name} (${sapMap.size} ordens SAP)`;
-        document.getElementById('sapStatus').textContent = 'Atualizado ✓';
-        processAndRender();
-
-        await saveToCloud("sap_atual", {
-          fileName: file.name,
-          updatedAt: nowStr,
-          entries: plainObj
-        }, "sapCloudMeta");
       };
       reader.readAsArrayBuffer(file);
     });
 
-    // 3. Motor de Cruzamento
+    // =========================================================================
+    // SINCRONIZAÇÃO COM FIREBASE (EM LOTES PARA EVITAR LIMITE DE 1MB)
+    // =========================================================================
+    async function savePlanoToCloud(fileName, rows) {
+      if (!db) return;
+      const badge = document.getElementById('cloudBadge');
+      const meta = document.getElementById('planoCloudMeta');
+      badge.className = "cloud-badge syncing";
+      badge.textContent = "🔄 Salvando plano...";
+      meta.textContent = "Enviando para a nuvem...";
+
+      try {
+        const CHUNK_SIZE = 1000;
+        const totalChunks = Math.ceil(rows.length / CHUNK_SIZE) || 1;
+        const nowStr = getNowBR();
+
+        for (let c = 0; c < totalChunks; c++) {
+          const slice = rows.slice(c * CHUNK_SIZE, (c + 1) * CHUNK_SIZE);
+          await setDoc(doc(db, COLLECTION_NAME, `plano_chunk_${c}`), { rows: slice });
+        }
+
+        await setDoc(doc(db, COLLECTION_NAME, "plano_meta"), {
+          fileName,
+          updatedAt: nowStr,
+          totalRows: rows.length,
+          totalChunks
+        });
+
+        badge.className = "cloud-badge online";
+        badge.textContent = "☁️ Nuvem Sincronizada";
+        meta.textContent = `☁️ Salvo na nuvem em ${nowStr}`;
+      } catch (err) {
+        console.error("Erro ao salvar plano:", err);
+        badge.className = "cloud-badge offline";
+        badge.textContent = "⚠️ Falha ao salvar na nuvem";
+        meta.textContent = `Erro nuvem: ${err.code || err.message}`;
+      }
+    }
+
+    async function saveSapToCloud(fileName, entriesObj) {
+      if (!db) return;
+      const badge = document.getElementById('cloudBadge');
+      const meta = document.getElementById('sapCloudMeta');
+      badge.className = "cloud-badge syncing";
+      badge.textContent = "🔄 Salvando SAP...";
+      meta.textContent = "Enviando para a nuvem...";
+
+      try {
+        const nowStr = getNowBR();
+        await setDoc(doc(db, COLLECTION_NAME, "sap_atual"), {
+          fileName,
+          updatedAt: nowStr,
+          entries: entriesObj
+        });
+
+        badge.className = "cloud-badge online";
+        badge.textContent = "☁️ Nuvem Sincronizada";
+        meta.textContent = `☁️ Atualizado na nuvem em ${nowStr}`;
+      } catch (err) {
+        console.error("Erro ao salvar SAP:", err);
+        badge.className = "cloud-badge offline";
+        badge.textContent = "⚠️ Falha ao salvar na nuvem";
+        meta.textContent = `Erro nuvem: ${err.code || err.message}`;
+      }
+    }
+
+    async function loadFromCloud() {
+      const badge = document.getElementById('cloudBadge');
+      try {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+
+        // Carrega Plano salvo
+        const metaSnap = await getDoc(doc(db, COLLECTION_NAME, "plano_meta"));
+        if (metaSnap.exists()) {
+          const meta = metaSnap.data();
+          let allRows = [];
+          for (let c = 0; c < (meta.totalChunks || 1); c++) {
+            const chunkSnap = await getDoc(doc(db, COLLECTION_NAME, `plano_chunk_${c}`));
+            if (chunkSnap.exists()) {
+              allRows = allRows.concat(chunkSnap.data().rows || []);
+            }
+          }
+          if (allRows.length > 0) {
+            rawPlanoRows = allRows;
+            const totalCx = rawPlanoRows.reduce((acc, r) => acc + r.qtd, 0);
+            document.getElementById('cardPlano').classList.add('loaded');
+            document.getElementById('planoFileName').textContent = `${meta.fileName} (${rawPlanoRows.length} linhas • ${totalCx.toLocaleString('pt-BR')} cx)`;
+            document.getElementById('planoCloudMeta').textContent = `☁️ Carregado da nuvem (${meta.updatedAt})`;
+            document.getElementById('planoStatus').textContent = 'Na Nuvem ✓';
+          }
+        } else {
+          document.getElementById('planoCloudMeta').textContent = "Nenhum plano salvo ainda. Selecione o Excel acima.";
+        }
+
+        // Carrega SAP salvo
+        const sapSnap = await getDoc(doc(db, COLLECTION_NAME, "sap_atual"));
+        if (sapSnap.exists()) {
+          const data = sapSnap.data();
+          sapMap = new Map(Object.entries(data.entries || {}));
+          document.getElementById('cardSap').classList.add('loaded');
+          document.getElementById('sapFileName').textContent = `${data.fileName} (${sapMap.size} ordens SAP)`;
+          document.getElementById('sapCloudMeta').textContent = `☁️ Carregado da nuvem (${data.updatedAt})`;
+          document.getElementById('sapStatus').textContent = 'Na Nuvem ✓';
+        } else {
+          document.getElementById('sapCloudMeta').textContent = "Nenhuma extração SAP salva ainda.";
+        }
+
+        badge.className = "cloud-badge online";
+        badge.textContent = "☁️ Nuvem Conectada";
+        processAndRender();
+      } catch (err) {
+        console.error("Erro ao conectar Firebase:", err);
+        badge.className = "cloud-badge offline";
+        badge.textContent = `⚠️ Nuvem Offline (${err.code || 'erro'})`;
+        document.getElementById('planoCloudMeta').textContent = "Modo local ativo — pode subir as planilhas normalmente.";
+        document.getElementById('sapCloudMeta').textContent = "Modo local ativo — pode subir as planilhas normalmente.";
+      }
+    }
+
+    // =========================================================================
+    // MOTOR DE CRUZAMENTO E RENDERIZAÇÃO
+    // =========================================================================
     window.processAndRender = function() {
       if (rawPlanoRows.length === 0) return;
 
@@ -970,7 +1010,6 @@
             obs: row.obs,
             cliente: row.cliente,
             demanda: row.demanda,
-            cxh: row.cxh,
             datas: [],
             progTotal: 0,
             progAteData: 0,
@@ -1209,7 +1248,7 @@
       XLSX.writeFile(wb, `PCP_MTG_FAB_${nomeAba}_${dataArquivo}.xlsx`);
     };
 
-    initFirebase();
+    loadFromCloud();
   </script>
 </body>
 </html>
