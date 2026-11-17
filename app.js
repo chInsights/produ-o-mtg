@@ -442,7 +442,7 @@ async function initCloudSync() {
 }
 
 // =========================================================================
-// 6. MOTOR DE CRUZAMENTO E RENDERIZAÇÃO
+// 6. MOTOR DE CRUZAMENTO USANDO "QUANTIDADE DA ORDEM (GMEIN)"
 // =========================================================================
 function processAndRender() {
   if (rawPlanoRows.length === 0) return;
@@ -509,9 +509,18 @@ function processAndRender() {
     ord.datas.sort((a, b) => a.dataIso.localeCompare(b.dataIso));
     const sapInfo = ord.hasWo ? sapMap.get(ord.wo) : null;
     const realizado = sapInfo ? sapInfo.qtdBoa : 0;
+
+    // Usa "Quantidade da ordem (GMEIN)" do SAP como alvo oficial da ordem; se não houver no SAP, usa progTotal
+    const qtdOrdemAlvo = (sapInfo && sapInfo.qtdOrdemSap > 0) ? sapInfo.qtdOrdemSap : ord.progTotal;
+    const hasSapOrder = Boolean(sapInfo && sapInfo.qtdOrdemSap > 0);
+
     const desc = (sapInfo && sapInfo.desc) ? sapInfo.desc : (ord.obs || ord.demanda || 'Sem descrição SAP');
-    const saldo = Math.max(0, ord.progTotal - realizado);
-    const pct = ord.progTotal > 0 ? Math.min(100, Math.round((realizado / ord.progTotal) * 100)) : 0;
+    const saldo = Math.max(0, qtdOrdemAlvo - realizado);
+    const pct = qtdOrdemAlvo > 0 ? Math.min(100, Math.round((realizado / qtdOrdemAlvo) * 100)) : 0;
+
+    // Se a ordem no SAP for maior que o lançado no plano atual, o esperado até a data também considera essa diferença
+    const jaRealizadoAntesDoPlano = Math.max(0, qtdOrdemAlvo - ord.progTotal);
+    const metaAcumuladaAteData = jaRealizadoAntesDoPlano + ord.progAteData;
 
     let status = 'prazo';
     const datasValidas = ord.datas.filter(d => d.dataIso !== 'SEM_DATA');
@@ -520,14 +529,14 @@ function processAndRender() {
 
     if (!ord.hasWo) {
       status = 'sem_wo';
-    } else if (realizado >= ord.progTotal && ord.progTotal > 0) {
+    } else if (realizado >= qtdOrdemAlvo && qtdOrdemAlvo > 0) {
       status = 'encerrar';
-    } else if (realizado < ord.progAteData && ultimaData < refDate) {
+    } else if (realizado < metaAcumuladaAteData && ultimaData < refDate) {
       status = 'atrasadas';
-      deficitAtraso += (ord.progAteData - realizado);
-    } else if (realizado < ord.progAteData && primeiraData <= refDate) {
+      deficitAtraso += (metaAcumuladaAteData - realizado);
+    } else if (realizado < metaAcumuladaAteData && primeiraData <= refDate) {
       status = primeiraData < refDate ? 'atrasadas' : 'atencao';
-      if (status === 'atrasadas') deficitAtraso += (ord.progAteData - realizado);
+      if (status === 'atrasadas') deficitAtraso += (metaAcumuladaAteData - realizado);
     } else if (datasValidas.some(d => d.dataIso === refDate)) {
       status = 'atencao';
     }
@@ -538,10 +547,12 @@ function processAndRender() {
     totalDuziasPlano += ord.duziasTotal;
     totalHorasAteHoje += ord.horasAteData;
     totalHorasPlano += ord.horasTotal;
-    totalRealizado += Math.min(realizado, ord.progTotal);
+    totalRealizado += realizado;
 
     consolidatedOrders.push({
       ...ord,
+      qtdOrdemAlvo,
+      hasSapOrder,
       desc,
       realizado,
       saldo,
@@ -564,7 +575,7 @@ function processAndRender() {
 
   document.getElementById('kpiRealizado').textContent = `${totalRealizado.toLocaleString('pt-BR')} cx`;
   const aderencia = totalProgAteHoje > 0 ? Math.round((totalRealizado / totalProgAteHoje) * 100) : 0;
-  document.getElementById('kpiAderencia').textContent = `Aderência até data: ${aderencia}%`;
+  document.getElementById('kpiAderencia').textContent = `Relação vs Prog. Data: ${aderencia}%`;
 
   const qtdAtrasadas = consolidatedOrders.filter(o => o.status === 'atrasadas').length;
   const qtdEncerrar = consolidatedOrders.filter(o => o.status === 'encerrar').length;
@@ -607,7 +618,7 @@ function renderTable() {
   }
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" class="empty-state">Nenhuma ordem ou artigo encontrado neste filtro.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="12" class="empty-state">Nenhuma ordem ou artigo encontrado neste filtro.</td></tr>`;
     return;
   }
 
@@ -624,6 +635,11 @@ function renderTable() {
     const classBadge = o.classe.includes('MTO') ? `<span class="pill pill-mto">MTO</span>` : `<span class="pill pill-mts">MTS</span>`;
     const blocoBadge = o.bloco === 'CONSIDERAR' ? `<span class="pill pill-purple" style="margin-top:3px;">Considerar</span>` : '';
 
+    const diffOrdemPlano = o.hasSapOrder && o.qtdOrdemAlvo !== o.progTotal;
+    const sapOrdemCol = o.hasSapOrder
+      ? `<span class="mono" style="${diffOrdemPlano ? 'color:var(--warning); font-weight:800;' : ''}">${o.qtdOrdemAlvo.toLocaleString('pt-BR')}</span>`
+      : `<span style="color:var(--text-muted); font-size:0.76rem;">—</span>`;
+
     return `
       <tr>
         <td>${badgeMap[o.status]}</td>
@@ -637,8 +653,9 @@ function renderTable() {
           <div>${classBadge}</div>
           ${blocoBadge}
         </td>
-        <td style="font-size:0.77rem; color:var(--text-muted); max-width:210px;">${datasStr}</td>
+        <td style="font-size:0.77rem; color:var(--text-muted); max-width:200px;">${datasStr}</td>
         <td class="mono">${o.progTotal.toLocaleString('pt-BR')}</td>
+        <td>${sapOrdemCol}</td>
         <td class="mono" style="color:var(--purple);">${Math.round(o.duziasTotal).toLocaleString('pt-BR')}</td>
         <td class="mono">${o.horasTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h</td>
         <td class="mono" style="color:var(--info);">${o.realizado.toLocaleString('pt-BR')}</td>
@@ -692,13 +709,13 @@ function exportarExcel(tipo) {
     'Demanda': o.demanda || '-',
     'Cliente / Solicitante': o.cliente || '-',
     'Datas Programadas': o.datas.map(d => `${formatDateBR(d.dataIso)} (${d.qtd})`).join(' | '),
-    'Programado até Data Base (Cx)': o.progAteData,
-    'Programado Total (Cx)': o.progTotal,
+    'Programado no Plano (Cx)': o.progTotal,
+    'Quantidade da Ordem SAP (GMEIN)': o.qtdOrdemAlvo,
     'Dúzias Previstas': Math.round(o.duziasTotal),
     'Horas Programadas': Number(o.horasTotal.toFixed(2)),
     'Realizado SAP (GMEIN)': o.realizado,
-    'Saldo Pendente (Cx)': o.saldo,
-    '% Concluído': `${o.pct}%`
+    'Saldo Pendente Ordem (Cx)': o.saldo,
+    '% Concluído Ordem': `${o.pct}%`
   }));
 
   const ws = XLSX.utils.json_to_sheet(rows);
