@@ -29,6 +29,9 @@
       --info: #0284c7;
       --info-bg: #f0f9ff;
       --info-border: #bae6fd;
+      --purple: #7c3aed;
+      --purple-bg: #f5f3ff;
+      --purple-border: #ddd6fe;
       --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
     }
 
@@ -53,7 +56,7 @@
       border-radius: 14px;
       padding: 18px 22px;
       box-shadow: var(--shadow-sm);
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .brand h1 {
@@ -84,6 +87,22 @@
       gap: 10px;
       flex-wrap: wrap;
     }
+
+    .cloud-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+    }
+    .cloud-badge.online { background: var(--success-bg); border-color: var(--success-border); color: var(--success); }
+    .cloud-badge.syncing { background: var(--warning-bg); border-color: var(--warning-border); color: var(--warning); }
+    .cloud-badge.offline { background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger); }
 
     .date-box {
       background: var(--bg-subtle);
@@ -119,7 +138,7 @@
       background: var(--bg-card);
       border: 1.5px dashed var(--border-strong);
       border-radius: 14px;
-      padding: 18px 20px;
+      padding: 16px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -140,8 +159,9 @@
       background: #f0fdf4;
     }
 
-    .upload-info h3 { font-size: 0.94rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
-    .upload-info p { font-size: 0.8rem; color: var(--text-muted); }
+    .upload-info h3 { font-size: 0.93rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
+    .upload-info p { font-size: 0.79rem; color: var(--text-muted); }
+    .upload-meta { font-size: 0.72rem; color: var(--accent); font-weight: 600; margin-top: 4px; }
 
     .upload-status {
       font-size: 0.75rem;
@@ -163,7 +183,7 @@
     /* KPIs */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
       gap: 14px;
       margin-bottom: 20px;
     }
@@ -176,9 +196,9 @@
       box-shadow: var(--shadow-sm);
     }
 
-    .kpi-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-    .kpi-value { font-size: 1.65rem; font-weight: 800; margin: 6px 0 4px; color: var(--text-main); }
-    .kpi-sub { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+    .kpi-label { font-size: 0.74rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    .kpi-value { font-size: 1.55rem; font-weight: 800; margin: 6px 0 4px; color: var(--text-main); }
+    .kpi-sub { font-size: 0.77rem; color: var(--text-muted); font-weight: 500; line-height: 1.35; }
 
     /* Search Bar Destacada */
     .search-panel {
@@ -248,9 +268,9 @@
       background: var(--bg-subtle);
       border: 1px solid var(--border-strong);
       color: var(--text-main);
-      padding: 9px 13px;
+      padding: 9px 12px;
       border-radius: 10px;
-      font-size: 0.83rem;
+      font-size: 0.82rem;
       font-weight: 600;
       outline: none;
       cursor: pointer;
@@ -260,7 +280,7 @@
       font-size: 0.8rem;
       font-weight: 600;
       color: var(--text-muted);
-      padding: 0 6px;
+      padding: 0 4px;
     }
 
     /* Toolbar & Export Bar */
@@ -381,7 +401,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.83rem;
+      font-size: 0.82rem;
       text-align: left;
     }
 
@@ -389,16 +409,16 @@
       background: var(--bg-subtle);
       color: var(--text-muted);
       font-weight: 700;
-      font-size: 0.73rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      padding: 13px 14px;
+      padding: 13px 12px;
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
 
     td {
-      padding: 12px 14px;
+      padding: 11px 12px;
       border-bottom: 1px solid var(--border);
       vertical-align: middle;
     }
@@ -412,9 +432,9 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 4px 10px;
+      padding: 4px 9px;
       border-radius: 999px;
-      font-size: 0.73rem;
+      font-size: 0.72rem;
       font-weight: 700;
       white-space: nowrap;
     }
@@ -423,11 +443,12 @@
     .pill-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
     .pill-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
     .pill-info { background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); }
+    .pill-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
     .pill-mto { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
     .pill-mts { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
     .progress-bar {
-      width: 90px;
+      width: 85px;
       height: 7px;
       background: #e2e8f0;
       border-radius: 999px;
@@ -451,6 +472,7 @@
       <p>Cruzamento Plano Mensal (MONTAGEM) × Apontamento SAP (COOIS)</p>
     </div>
     <div class="controls-top">
+      <div class="cloud-badge" id="cloudBadge">☁️ Conectando ao Firebase...</div>
       <div class="date-box">
         <span>Data Base:</span>
         <input type="date" id="refDateInput" />
@@ -462,27 +484,40 @@
     <label class="upload-card" id="cardPlano">
       <div class="upload-info">
         <h3>1. Plano de Produção (Aba MONTAGEM)</h3>
-        <p id="planoFileName">Clique para selecionar a planilha do plano (.xlsx)</p>
+        <p id="planoFileName">Clique para atualizar o plano na nuvem (.xlsx)</p>
+        <div class="upload-meta" id="planoCloudMeta">Aguardando sincronização com a nuvem...</div>
       </div>
-      <span class="upload-status" id="planoStatus">Aguardando</span>
+      <span class="upload-status" id="planoStatus">Nuvem</span>
       <input type="file" id="inputPlano" accept=".xlsx,.xls,.csv" hidden />
     </label>
 
     <label class="upload-card" id="cardSap">
       <div class="upload-info">
         <h3>2. Relatório SAP (COOIS / GMEIN)</h3>
-        <p id="sapFileName">Clique para selecionar a extração do SAP (.xlsx)</p>
+        <p id="sapFileName">Clique para alimentar apontamentos do SAP (.xlsx)</p>
+        <div class="upload-meta" id="sapCloudMeta">Aguardando sincronização com a nuvem...</div>
       </div>
-      <span class="upload-status" id="sapStatus">Aguardando</span>
+      <span class="upload-status" id="sapStatus">Nuvem</span>
       <input type="file" id="inputSap" accept=".xlsx,.xls,.csv" hidden />
     </label>
   </section>
 
+  <!-- KPIs Gerenciais com Caixas, Dúzias e Horas -->
   <section class="kpi-grid">
     <div class="kpi-card">
-      <div class="kpi-label">Programado até Data Base</div>
-      <div class="kpi-value mono" id="kpiProgAteHoje">0</div>
-      <div class="kpi-sub" id="kpiProgTotal">Total no plano: 0 cx</div>
+      <div class="kpi-label">Total Programado (Caixas)</div>
+      <div class="kpi-value mono" id="kpiProgTotal">0</div>
+      <div class="kpi-sub" id="kpiProgAteHoje">Até Data Base: 0 cx</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Dúzias Programadas</div>
+      <div class="kpi-value mono" style="color: var(--purple);" id="kpiDuziasTotal">0</div>
+      <div class="kpi-sub" id="kpiDuziasAteHoje">Até Data Base: 0 dz</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Horas Programadas</div>
+      <div class="kpi-value mono" style="color: var(--accent);" id="kpiHorasTotal">0,00 h</div>
+      <div class="kpi-sub" id="kpiHorasAteHoje">Até Data Base: 0,00 h</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Realizado SAP (GMEIN)</div>
@@ -501,16 +536,21 @@
     </div>
   </section>
 
-  <!-- Campo de Pesquisa de Ordem ou Artigo -->
+  <!-- Campo de Pesquisa e Filtros de Bloco/Classe -->
   <section class="search-panel">
     <div class="search-box">
       <span style="font-size: 1rem;">🔍</span>
-      <input type="text" id="searchInput" placeholder="Pesquisar por Ordem (Wo), Artigo (SKU) ou Descrição... (separe por vírgula para buscar vários)" />
+      <input type="text" id="searchInput" placeholder="Pesquisar por Ordem (Wo), Artigo (SKU), Demanda ou Descrição... (separe por vírgula para buscar vários)" />
       <button class="btn-clear-search" id="btnClearSearch" onclick="limparBusca()">Limpar ✕</button>
     </div>
     <div class="search-actions">
       <span class="search-counter" id="searchCounter"></span>
-      <select id="filterClass">
+      <select id="filterBloco" onchange="processAndRender()">
+        <option value="TODOS">Bloco: Plano + Considerar</option>
+        <option value="OFICIAL">Apenas Plano Oficial (antes de Considerar)</option>
+        <option value="CONSIDERAR">Apenas Bloco "Considerar"</option>
+      </select>
+      <select id="filterClass" onchange="processAndRender()">
         <option value="TODOS">Classe: Todas (MTO + MTS)</option>
         <option value="SKU MTO">Apenas SKU MTO</option>
         <option value="SKU MTS">Apenas SKU MTS</option>
@@ -524,6 +564,7 @@
       <button class="tab-btn" data-tab="atrasadas">🔴 Atrasadas <span class="tab-count" id="cntAtrasadas">0</span></button>
       <button class="tab-btn" data-tab="atencao">🟡 Atenção / Hoje <span class="tab-count" id="cntAtencao">0</span></button>
       <button class="tab-btn" data-tab="prazo">🔵 No Prazo <span class="tab-count" id="cntPrazo">0</span></button>
+      <button class="tab-btn" data-tab="sem_wo">⚪ Sem Wo / Previsão <span class="tab-count" id="cntSemWo">0</span></button>
       <button class="tab-btn" data-tab="encerrar">🟢 Ordens para Encerrar <span class="tab-count" id="cntEncerrar">0</span></button>
     </div>
 
@@ -541,26 +582,42 @@
           <th>Status</th>
           <th>Ordem (Wo)</th>
           <th>Artigo (SKU) / Descrição</th>
-          <th>Class.</th>
+          <th>Classe / Bloco</th>
           <th>Datas Programadas</th>
-          <th>Prog. até Data</th>
-          <th>Prog. Total</th>
+          <th>Prog. Cx</th>
+          <th>Dúzias Prev.</th>
+          <th>Horas Prog.</th>
           <th>Realizado SAP</th>
-          <th>Saldo Pendente</th>
+          <th>Saldo Cx</th>
           <th>% Concluído</th>
         </tr>
       </thead>
       <tbody id="tableBody">
         <tr>
-          <td colspan="10" class="empty-state">
-            Importe a planilha do <strong>Plano de Produção</strong> e o <strong>Relatório SAP</strong> acima para iniciar o cruzamento.
+          <td colspan="11" class="empty-state">
+            Carregando dados da nuvem ou aguardando importação das planilhas...
           </td>
         </tr>
       </tbody>
     </table>
   </section>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8xIc7gLsG_u2E4GjZ1a9lA2_zUsvbs04",
+      authDomain: "pcp-mtg-fab.firebaseapp.com",
+      projectId: "pcp-mtg-fab",
+      storageBucket: "pcp-mtg-fab.firebasestorage.app",
+      messagingSenderId: "749171419070",
+      appId: "1:749171419070:web:a0c92919c443f5c1f1fbef"
+    };
+
+    let db = null;
+    const COLLECTION_NAME = "pcp_mtg_fab";
+
     let rawPlanoRows = [];
     let sapMap = new Map();
     let consolidatedOrders = [];
@@ -578,14 +635,12 @@
       renderTable();
     });
 
-    function limparBusca() {
+    window.limparBusca = function() {
       searchInput.value = '';
       btnClearSearch.style.display = 'none';
       searchInput.focus();
       renderTable();
-    }
-
-    document.getElementById('filterClass').addEventListener('change', renderTable);
+    };
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -597,9 +652,78 @@
       });
     });
 
+    function initFirebase() {
+      const badge = document.getElementById('cloudBadge');
+      try {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        badge.className = "cloud-badge online";
+        badge.textContent = "☁️ Nuvem Conectada";
+
+        onSnapshot(doc(db, COLLECTION_NAME, "plano_atual"), (snap) => {
+          if (snap.exists()) {
+            const data = snap.data();
+            rawPlanoRows = data.rows || [];
+            const totalCx = rawPlanoRows.reduce((acc, r) => acc + r.qtd, 0);
+            document.getElementById('cardPlano').classList.add('loaded');
+            document.getElementById('planoFileName').textContent = `${data.fileName || 'Plano Salvo'} (${rawPlanoRows.length} linhas • ${totalCx.toLocaleString('pt-BR')} cx)`;
+            document.getElementById('planoCloudMeta').textContent = `☁️ Salvo na nuvem em ${data.updatedAt || '-'}`;
+            document.getElementById('planoStatus').textContent = 'Na Nuvem ✓';
+            processAndRender();
+          } else {
+            document.getElementById('planoCloudMeta').textContent = "Nenhum plano salvo na nuvem ainda. Faça o 1º upload.";
+          }
+        }, (err) => {
+          console.error("Erro ao ler plano do Firebase:", err);
+          badge.className = "cloud-badge offline";
+          badge.textContent = "⚠️ Erro de permissão no Firestore";
+        });
+
+        onSnapshot(doc(db, COLLECTION_NAME, "sap_atual"), (snap) => {
+          if (snap.exists()) {
+            const data = snap.data();
+            const entries = data.entries || {};
+            sapMap = new Map(Object.entries(entries));
+            document.getElementById('cardSap').classList.add('loaded');
+            document.getElementById('sapFileName').textContent = `${data.fileName || 'Extração SAP'} (${sapMap.size} ordens SAP)`;
+            document.getElementById('sapCloudMeta').textContent = `☁️ Atualizado na nuvem em ${data.updatedAt || '-'}`;
+            document.getElementById('sapStatus').textContent = 'Na Nuvem ✓';
+            processAndRender();
+          } else {
+            document.getElementById('sapCloudMeta').textContent = "Nenhuma extração SAP salva na nuvem ainda.";
+          }
+        });
+      } catch (e) {
+        console.error("Falha ao iniciar Firebase:", e);
+        badge.className = "cloud-badge offline";
+        badge.textContent = "⚠️ Erro ao conectar Firebase";
+      }
+    }
+
+    async function saveToCloud(docId, payload, metaElementId) {
+      if (!db) return;
+      const badge = document.getElementById('cloudBadge');
+      badge.className = "cloud-badge syncing";
+      badge.textContent = "🔄 Salvando na nuvem...";
+      try {
+        await setDoc(doc(db, COLLECTION_NAME, docId), payload);
+        badge.className = "cloud-badge online";
+        badge.textContent = "☁️ Nuvem Sincronizada";
+      } catch (err) {
+        console.error("Erro ao salvar no Firestore:", err);
+        badge.className = "cloud-badge offline";
+        badge.textContent = "⚠️ Falha ao salvar na nuvem";
+        document.getElementById(metaElementId).textContent = "Erro ao gravar no Firestore (verifique as regras do banco).";
+      }
+    }
+
+    function getNowBR() {
+      return new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    }
+
     function parseExcelDate(val) {
       if (!val) return null;
-      if (typeof val === 'number') {
+      if (typeof val === 'number' && val > 20000) {
         const utcDays = Math.floor(val - 25569);
         const dateObj = new Date(utcDays * 86400 * 1000);
         return dateObj.toISOString().split('T')[0];
@@ -609,8 +733,13 @@
       if (brMatch) {
         return `${brMatch[3]}-${brMatch[2].padStart(2, '0')}-${brMatch[1].padStart(2, '0')}`;
       }
+      const brShort = str.match(/^(\d{1,2})\/(\d{1,2})$/);
+      if (brShort) {
+        const year = new Date().getFullYear();
+        return `${year}-${brShort[2].padStart(2, '0')}-${brShort[1].padStart(2, '0')}`;
+      }
       const meses = { jan:'01', fev:'02', mar:'03', abr:'04', mai:'05', jun:'06', jul:'07', ago:'08', set:'09', out:'10', nov:'11', dez:'12' };
-      const ptMatch = str.toLowerCase().match(/^(\d{1,2})[-\/]([a-z]{3})$/);
+      const ptMatch = str.toLowerCase().match(/^(\d{1,2})[-\/.]([a-z]{3})$/);
       if (ptMatch && meses[ptMatch[2]]) {
         const year = new Date().getFullYear();
         return `${year}-${meses[ptMatch[2]]}-${ptMatch[1].padStart(2, '0')}`;
@@ -619,29 +748,39 @@
     }
 
     function formatDateBR(iso) {
-      if (!iso) return '-';
+      if (!iso || iso === 'SEM_DATA') return 'S/ Data';
       const [y, m, d] = iso.split('-');
       return `${d}/${m}`;
     }
 
     function parseNumber(val) {
-      if (typeof val === 'number') return val;
+      if (typeof val === 'number') return isNaN(val) ? 0 : val;
       if (!val) return 0;
-      const cleaned = String(val).replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
-      return parseFloat(cleaned) || 0;
+      const str = String(val).trim();
+      if (str === '-' || str === '') return 0;
+      if (str.includes(',') && str.includes('.')) {
+        return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+      }
+      if (str.includes(',')) {
+        return parseFloat(str.replace(',', '.')) || 0;
+      }
+      if (/^\d{1,3}(\.\d{3})+$/.test(str)) {
+        return parseFloat(str.replace(/\./g, '')) || 0;
+      }
+      return parseFloat(str.replace(/[^\d.-]/g, '')) || 0;
     }
 
     function normalizeKey(str) {
       return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
     }
 
-    // 1. Leitura do Plano (Aba MONTAGEM)
+    // 1. Upload e Salvamento do Plano (Aba MONTAGEM)
     document.getElementById('inputPlano').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (evt) => {
+      reader.onload = async (evt) => {
         const wb = XLSX.read(evt.target.result, { type: 'array' });
         const sheetName = wb.SheetNames.find(n => n.toUpperCase().includes('MONTAGEM')) || wb.SheetNames[0];
         const ws = wb.Sheets[sheetName];
@@ -659,6 +798,7 @@
 
         const headers = matrix[headerIdx].map(h => normalizeKey(h));
         const col = {
+          linha: headers.findIndex(h => h === 'linha'),
           data: headers.findIndex(h => h === 'data'),
           area: headers.findIndex(h => h === 'area'),
           wo: headers.findIndex(h => h === 'wo'),
@@ -668,20 +808,38 @@
           obs: headers.findIndex(h => h.includes('observa')),
           qtd: headers.findIndex(h => h === 'qtd'),
           classe: headers.findIndex(h => h.includes('class')),
-          cliente: headers.findIndex(h => h.includes('cliente'))
+          cliente: headers.findIndex(h => h.includes('cliente')),
+          horas: headers.findIndex(h => h === 'horas' || h.includes('horas')),
+          demandas: headers.findIndex(h => h.includes('demanda')),
+          duzias: headers.findIndex(h => h.includes('duzia'))
         };
 
-        rawPlanoRows = [];
+        const parsedRows = [];
+        let blocoAtual = 'OFICIAL';
+
         for (let i = headerIdx + 1; i < matrix.length; i++) {
           const r = matrix[i];
-          const wo = String(r[col.wo] || '').trim();
+          const colA = normalizeKey(r[col.linha >= 0 ? col.linha : 0]);
+
+          if (colA.includes('considerar')) {
+            blocoAtual = 'CONSIDERAR';
+            continue;
+          }
+
+          let wo = String(r[col.wo] || '').trim();
+          if (wo === '-' || wo === '0') wo = '';
+
           const item = String(r[col.item] || '').trim();
           const qtd = parseNumber(r[col.qtd]);
-          const dataIso = parseExcelDate(r[col.data]);
+          const horas = col.horas >= 0 ? parseNumber(r[col.horas]) : 0;
+          const duzias = col.duzias >= 0 ? parseNumber(r[col.duzias]) : 0;
+          const dataIso = parseExcelDate(r[col.data]) || 'SEM_DATA';
 
-          if (!wo || !item || qtd <= 0 || !dataIso) continue;
+          if (!item || qtd <= 0) continue;
 
-          rawPlanoRows.push({
+          parsedRows.push({
+            rowIndex: i + 1,
+            bloco: blocoAtual,
             wo,
             item,
             dataIso,
@@ -690,26 +848,39 @@
             etq: String(r[col.etq] || '').trim(),
             obs: String(r[col.obs] || '').trim(),
             qtd,
+            horas,
+            duzias,
             classe: String(r[col.classe] || '').trim(),
-            cliente: String(r[col.cliente] || '').trim()
+            cliente: String(r[col.cliente] || '').trim(),
+            demanda: col.demandas >= 0 ? String(r[col.demandas] || '').trim() : ''
           });
         }
 
+        rawPlanoRows = parsedRows;
+        const nowStr = getNowBR();
+        const totalCxLido = rawPlanoRows.reduce((acc, r) => acc + r.qtd, 0);
+
         document.getElementById('cardPlano').classList.add('loaded');
-        document.getElementById('planoFileName').textContent = `${file.name} (${rawPlanoRows.length} linhas lidas)`;
+        document.getElementById('planoFileName').textContent = `${file.name} (${rawPlanoRows.length} linhas • ${totalCxLido.toLocaleString('pt-BR')} cx)`;
         document.getElementById('planoStatus').textContent = 'Carregado ✓';
         processAndRender();
+
+        await saveToCloud("plano_atual", {
+          fileName: file.name,
+          updatedAt: nowStr,
+          rows: parsedRows
+        }, "planoCloudMeta");
       };
       reader.readAsArrayBuffer(file);
     });
 
-    // 2. Leitura do Relatório SAP
+    // 2. Upload e Salvamento do Relatório SAP
     document.getElementById('inputSap').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (evt) => {
+      reader.onload = async (evt) => {
         const wb = XLSX.read(evt.target.result, { type: 'array' });
         const ws = wb.Sheets[wb.SheetNames[0]];
         const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
@@ -734,54 +905,91 @@
           conclusao: headers.findIndex(h => h.includes('conclusao'))
         };
 
-        sapMap.clear();
+        const newMap = new Map();
+        const plainObj = {};
+
         for (let i = headerIdx + 1; i < matrix.length; i++) {
           const r = matrix[i];
           const ordem = String(r[col.ordem] || '').trim();
           if (!ordem) continue;
 
-          sapMap.set(ordem, {
+          const entry = {
             material: String(r[col.material] || '').trim(),
             desc: String(r[col.desc] || '').trim(),
             qtdOrdemSap: parseNumber(r[col.qtdOrdem]),
             qtdBoa: parseNumber(r[col.qtdBoa]),
             dataConclusao: parseExcelDate(r[col.conclusao])
-          });
+          };
+          newMap.set(ordem, entry);
+          plainObj[ordem] = entry;
         }
+
+        sapMap = newMap;
+        const nowStr = getNowBR();
 
         document.getElementById('cardSap').classList.add('loaded');
         document.getElementById('sapFileName').textContent = `${file.name} (${sapMap.size} ordens SAP)`;
         document.getElementById('sapStatus').textContent = 'Atualizado ✓';
         processAndRender();
+
+        await saveToCloud("sap_atual", {
+          fileName: file.name,
+          updatedAt: nowStr,
+          entries: plainObj
+        }, "sapCloudMeta");
       };
       reader.readAsArrayBuffer(file);
     });
 
     // 3. Motor de Cruzamento
-    function processAndRender() {
+    window.processAndRender = function() {
       if (rawPlanoRows.length === 0) return;
 
       const refDate = refDateInput.value;
+      const blocoFilter = document.getElementById('filterBloco').value;
+      const classFilter = document.getElementById('filterClass').value;
+
+      const filteredRows = rawPlanoRows.filter(r => {
+        if (blocoFilter !== 'TODOS' && r.bloco !== blocoFilter) return false;
+        if (classFilter !== 'TODOS' && r.classe.toUpperCase() !== classFilter) return false;
+        return true;
+      });
+
       const grouped = new Map();
 
-      rawPlanoRows.forEach(row => {
-        if (!grouped.has(row.wo)) {
-          grouped.set(row.wo, {
-            wo: row.wo,
+      filteredRows.forEach((row) => {
+        const groupKey = row.wo ? `WO_${row.wo}` : `SEM_WO_${row.item}_${row.dataIso}_${row.rowIndex}`;
+
+        if (!grouped.has(groupKey)) {
+          grouped.set(groupKey, {
+            wo: row.wo || '',
+            hasWo: Boolean(row.wo),
+            bloco: row.bloco,
             item: row.item,
             classe: row.classe,
             obs: row.obs,
             cliente: row.cliente,
+            demanda: row.demanda,
             cxh: row.cxh,
             datas: [],
             progTotal: 0,
-            progAteData: 0
+            progAteData: 0,
+            duziasTotal: 0,
+            duziasAteData: 0,
+            horasTotal: 0,
+            horasAteData: 0
           });
         }
-        const entry = grouped.get(row.wo);
+
+        const entry = grouped.get(groupKey);
         entry.progTotal += row.qtd;
-        if (row.dataIso <= refDate) {
+        entry.duziasTotal += row.duzias;
+        entry.horasTotal += row.horas;
+
+        if (row.dataIso !== 'SEM_DATA' && row.dataIso <= refDate) {
           entry.progAteData += row.qtd;
+          entry.duziasAteData += row.duzias;
+          entry.horasAteData += row.horas;
         }
         entry.datas.push({ dataIso: row.dataIso, qtd: row.qtd });
       });
@@ -789,22 +997,29 @@
       consolidatedOrders = [];
       let totalProgAteHoje = 0;
       let totalProgPlano = 0;
+      let totalDuziasAteHoje = 0;
+      let totalDuziasPlano = 0;
+      let totalHorasAteHoje = 0;
+      let totalHorasPlano = 0;
       let totalRealizado = 0;
       let deficitAtraso = 0;
 
       grouped.forEach(ord => {
         ord.datas.sort((a, b) => a.dataIso.localeCompare(b.dataIso));
-        const sapInfo = sapMap.get(ord.wo);
+        const sapInfo = ord.hasWo ? sapMap.get(ord.wo) : null;
         const realizado = sapInfo ? sapInfo.qtdBoa : 0;
-        const desc = sapInfo && sapInfo.desc ? sapInfo.desc : (ord.obs || 'Sem descrição SAP');
+        const desc = (sapInfo && sapInfo.desc) ? sapInfo.desc : (ord.obs || ord.demanda || 'Sem descrição SAP');
         const saldo = Math.max(0, ord.progTotal - realizado);
         const pct = ord.progTotal > 0 ? Math.min(100, Math.round((realizado / ord.progTotal) * 100)) : 0;
 
         let status = 'prazo';
-        const primeiraData = ord.datas[0].dataIso;
-        const ultimaData = ord.datas[ord.datas.length - 1].dataIso;
+        const datasValidas = ord.datas.filter(d => d.dataIso !== 'SEM_DATA');
+        const primeiraData = datasValidas.length > 0 ? datasValidas[0].dataIso : '9999-12-31';
+        const ultimaData = datasValidas.length > 0 ? datasValidas[datasValidas.length - 1].dataIso : '9999-12-31';
 
-        if (realizado >= ord.progTotal && ord.progTotal > 0) {
+        if (!ord.hasWo) {
+          status = 'sem_wo';
+        } else if (realizado >= ord.progTotal && ord.progTotal > 0) {
           status = 'encerrar';
         } else if (realizado < ord.progAteData && ultimaData < refDate) {
           status = 'atrasadas';
@@ -812,12 +1027,16 @@
         } else if (realizado < ord.progAteData && primeiraData <= refDate) {
           status = primeiraData < refDate ? 'atrasadas' : 'atencao';
           if (status === 'atrasadas') deficitAtraso += (ord.progAteData - realizado);
-        } else if (ord.datas.some(d => d.dataIso === refDate)) {
+        } else if (datasValidas.some(d => d.dataIso === refDate)) {
           status = 'atencao';
         }
 
         totalProgAteHoje += ord.progAteData;
         totalProgPlano += ord.progTotal;
+        totalDuziasAteHoje += ord.duziasAteData;
+        totalDuziasPlano += ord.duziasTotal;
+        totalHorasAteHoje += ord.horasAteData;
+        totalHorasPlano += ord.horasTotal;
         totalRealizado += Math.min(realizado, ord.progTotal);
 
         consolidatedOrders.push({
@@ -830,12 +1049,19 @@
         });
       });
 
-      const pesoStatus = { atrasadas: 1, atencao: 2, prazo: 3, encerrar: 4 };
+      const pesoStatus = { atrasadas: 1, atencao: 2, prazo: 3, sem_wo: 4, encerrar: 5 };
       consolidatedOrders.sort((a, b) => pesoStatus[a.status] - pesoStatus[b.status] || a.datas[0].dataIso.localeCompare(b.datas[0].dataIso));
 
-      document.getElementById('kpiProgAteHoje').textContent = totalProgAteHoje.toLocaleString('pt-BR');
-      document.getElementById('kpiProgTotal').textContent = `Total no plano: ${totalProgPlano.toLocaleString('pt-BR')} cx`;
-      document.getElementById('kpiRealizado').textContent = totalRealizado.toLocaleString('pt-BR');
+      document.getElementById('kpiProgTotal').textContent = `${totalProgPlano.toLocaleString('pt-BR')} cx`;
+      document.getElementById('kpiProgAteHoje').textContent = `Até Data Base: ${totalProgAteHoje.toLocaleString('pt-BR')} cx`;
+
+      document.getElementById('kpiDuziasTotal').textContent = `${Math.round(totalDuziasPlano).toLocaleString('pt-BR')} dz`;
+      document.getElementById('kpiDuziasAteHoje').textContent = `Até Data Base: ${Math.round(totalDuziasAteHoje).toLocaleString('pt-BR')} dz`;
+
+      document.getElementById('kpiHorasTotal').textContent = `${totalHorasPlano.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h`;
+      document.getElementById('kpiHorasAteHoje').textContent = `Até Data Base: ${totalHorasAteHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h`;
+
+      document.getElementById('kpiRealizado').textContent = `${totalRealizado.toLocaleString('pt-BR')} cx`;
       const aderencia = totalProgAteHoje > 0 ? Math.round((totalRealizado / totalProgAteHoje) * 100) : 0;
       document.getElementById('kpiAderencia').textContent = `Aderência até data: ${aderencia}%`;
 
@@ -849,24 +1075,21 @@
       document.getElementById('cntAtrasadas').textContent = qtdAtrasadas;
       document.getElementById('cntAtencao').textContent = consolidatedOrders.filter(o => o.status === 'atencao').length;
       document.getElementById('cntPrazo').textContent = consolidatedOrders.filter(o => o.status === 'prazo').length;
+      document.getElementById('cntSemWo').textContent = consolidatedOrders.filter(o => o.status === 'sem_wo').length;
       document.getElementById('cntEncerrar').textContent = qtdEncerrar;
 
       renderTable();
-    }
+    };
 
     function renderTable() {
       const tbody = document.getElementById('tableBody');
       const rawQuery = normalizeKey(searchInput.value);
-      const classFilter = document.getElementById('filterClass').value;
-
-      // Permite buscar múltiplos termos separados por vírgula ou ponto-e-vírgula
       const terms = rawQuery.split(/[,;]+/).map(t => t.trim()).filter(Boolean);
 
       const filtered = consolidatedOrders.filter(o => {
         if (currentTab !== 'todas' && o.status !== currentTab) return false;
-        if (classFilter !== 'TODOS' && o.classe.toUpperCase() !== classFilter) return false;
         if (terms.length > 0) {
-          const hay = normalizeKey(`${o.wo} ${o.item} ${o.desc} ${o.cliente}`);
+          const hay = normalizeKey(`${o.wo} ${o.item} ${o.desc} ${o.cliente} ${o.demanda}`);
           const matched = terms.some(term => hay.includes(term));
           if (!matched) return false;
         }
@@ -875,13 +1098,15 @@
 
       const counterEl = document.getElementById('searchCounter');
       if (consolidatedOrders.length > 0) {
-        counterEl.textContent = `Exibindo ${filtered.length} de ${consolidatedOrders.length} ordens`;
+        const somaCxFiltro = filtered.reduce((acc, o) => acc + o.progTotal, 0);
+        const somaDzFiltro = filtered.reduce((acc, o) => acc + o.duziasTotal, 0);
+        counterEl.textContent = `${filtered.length} itens (${somaCxFiltro.toLocaleString('pt-BR')} cx • ${Math.round(somaDzFiltro).toLocaleString('pt-BR')} dz)`;
       } else {
         counterEl.textContent = '';
       }
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="empty-state">Nenhuma ordem ou artigo encontrado neste filtro.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" class="empty-state">Nenhuma ordem ou artigo encontrado neste filtro.</td></tr>`;
         return;
       }
 
@@ -890,28 +1115,35 @@
           atrasadas: `<span class="pill pill-danger">🔴 Atrasada</span>`,
           atencao: `<span class="pill pill-warning">🟡 Atenção / Hoje</span>`,
           prazo: `<span class="pill pill-info">🔵 No Prazo</span>`,
+          sem_wo: `<span class="pill pill-mts">⚪ Sem Wo</span>`,
           encerrar: `<span class="pill pill-success">🟢 Encerrar (100%)</span>`
         };
         const barColor = o.status === 'encerrar' ? 'var(--success)' : o.status === 'atrasadas' ? 'var(--danger)' : 'var(--accent)';
         const datasStr = o.datas.map(d => `${formatDateBR(d.dataIso)} (${d.qtd.toLocaleString('pt-BR')})`).join(' • ');
         const classBadge = o.classe.includes('MTO') ? `<span class="pill pill-mto">MTO</span>` : `<span class="pill pill-mts">MTS</span>`;
+        const blocoBadge = o.bloco === 'CONSIDERAR' ? `<span class="pill pill-purple" style="margin-top:3px;">Considerar</span>` : '';
 
         return `
           <tr>
             <td>${badgeMap[o.status]}</td>
-            <td class="mono">${o.wo}</td>
+            <td class="mono">${o.hasWo ? o.wo : '<span style="color:var(--text-muted); font-weight:500;">—</span>'}</td>
             <td>
               <div style="font-weight:700; color:var(--text-main);">${o.item}</div>
-              <div style="font-size:0.76rem; color:var(--text-muted);">${o.desc}</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">${o.desc}</div>
+              ${o.demanda ? `<div style="font-size:0.71rem; color:var(--accent); font-weight:600; margin-top:2px;">${o.demanda}</div>` : ''}
             </td>
-            <td>${classBadge}</td>
-            <td style="font-size:0.78rem; color:var(--text-muted); max-width:220px;">${datasStr}</td>
-            <td class="mono">${o.progAteData.toLocaleString('pt-BR')}</td>
+            <td>
+              <div>${classBadge}</div>
+              ${blocoBadge}
+            </td>
+            <td style="font-size:0.77rem; color:var(--text-muted); max-width:210px;">${datasStr}</td>
             <td class="mono">${o.progTotal.toLocaleString('pt-BR')}</td>
+            <td class="mono" style="color:var(--purple);">${Math.round(o.duziasTotal).toLocaleString('pt-BR')}</td>
+            <td class="mono">${o.horasTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h</td>
             <td class="mono" style="color:var(--info);">${o.realizado.toLocaleString('pt-BR')}</td>
             <td class="mono" style="color:${o.saldo > 0 ? 'var(--danger)' : 'var(--success)'};">${o.saldo.toLocaleString('pt-BR')}</td>
             <td>
-              <div class="mono" style="font-size:0.78rem;">${o.pct}%</div>
+              <div class="mono" style="font-size:0.77rem;">${o.pct}%</div>
               <div class="progress-bar"><div class="progress-fill" style="width:${o.pct}%; background:${barColor};"></div></div>
             </td>
           </tr>
@@ -919,14 +1151,14 @@
       }).join('');
     }
 
-    function copiarOrdensEncerrar() {
-      const lista = consolidatedOrders.filter(o => o.status === 'encerrar').map(o => o.wo).join('\n');
+    window.copiarOrdensEncerrar = function() {
+      const lista = consolidatedOrders.filter(o => o.status === 'encerrar' && o.hasWo).map(o => o.wo).join('\n');
       if (!lista) return alert('Não há ordens 100% concluídas para copiar.');
       navigator.clipboard.writeText(lista);
       alert('Lista de ordens (Wo) copiada! Cole direto na seleção múltipla da COOIS no SAP.');
-    }
+    };
 
-    function exportarExcel(tipo) {
+    window.exportarExcel = function(tipo) {
       if (consolidatedOrders.length === 0) {
         return alert('Importe o Plano de Produção e o Relatório SAP antes de exportar.');
       }
@@ -945,21 +1177,26 @@
         atrasadas: 'ATRASADA',
         atencao: 'ATENÇÃO / HOJE',
         prazo: 'NO PRAZO',
+        sem_wo: 'SEM WO / PREVISÃO',
         encerrar: 'CONCLUÍDA (ENCERRAR SAP)'
       };
 
       const rows = lista.map(o => ({
         'Status': labelStatus[o.status],
-        'Ordem (Wo)': o.wo,
+        'Bloco': o.bloco,
+        'Ordem (Wo)': o.wo || 'Sem Wo',
         'Artigo (SKU)': o.item,
         'Descrição': o.desc,
-        'Classificação': o.classe,
+        'Classe': o.classe,
+        'Demanda': o.demanda || '-',
         'Cliente / Solicitante': o.cliente || '-',
         'Datas Programadas': o.datas.map(d => `${formatDateBR(d.dataIso)} (${d.qtd})`).join(' | '),
-        'Programado até Data Base': o.progAteData,
-        'Programado Total': o.progTotal,
+        'Programado até Data Base (Cx)': o.progAteData,
+        'Programado Total (Cx)': o.progTotal,
+        'Dúzias Previstas': Math.round(o.duziasTotal),
+        'Horas Programadas': Number(o.horasTotal.toFixed(2)),
         'Realizado SAP (GMEIN)': o.realizado,
-        'Saldo Pendente': o.saldo,
+        'Saldo Pendente (Cx)': o.saldo,
         '% Concluído': `${o.pct}%`
       }));
 
@@ -970,7 +1207,9 @@
 
       const dataArquivo = refDateInput.value || new Date().toISOString().split('T')[0];
       XLSX.writeFile(wb, `PCP_MTG_FAB_${nomeAba}_${dataArquivo}.xlsx`);
-    }
+    };
+
+    initFirebase();
   </script>
 </body>
 </html>
