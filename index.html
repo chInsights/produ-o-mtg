@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PCP MTG FAB. | Painel de Acompanhamento de Produção</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-subtle: #f8fafc;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --danger-border: #fecaca;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --success: #059669;
+      --success-bg: #ecfdf5;
+      --success-border: #a7f3d0;
+      --info: #0284c7;
+      --info-bg: #f0f9ff;
+      --info-border: #bae6fd;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+    body {
+      background: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 22px 28px;
+    }
+
+    /* Header */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 22px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .brand h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-area {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid #bfdbfe;
+      font-size: 0.74rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .brand p { color: var(--text-muted); font-size: 0.84rem; margin-top: 3px; }
+
+    .controls-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .date-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      padding: 8px 14px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .date-box input {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    /* Upload Zone */
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .upload-card {
+      background: var(--bg-card);
+      border: 1.5px dashed var(--border-strong);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .upload-card:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .upload-card.loaded {
+      border-style: solid;
+      border-color: var(--success);
+      background: #f0fdf4;
+    }
+
+    .upload-info h3 { font-size: 0.94rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
+    .upload-info p { font-size: 0.8rem; color: var(--text-muted); }
+
+    .upload-status {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--bg-base);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .upload-card.loaded .upload-status {
+      background: var(--success-bg);
+      color: var(--success);
+      border-color: var(--success-border);
+    }
+
+    /* KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kpi-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    .kpi-value { font-size: 1.65rem; font-weight: 800; margin: 6px 0 4px; color: var(--text-main); }
+    .kpi-sub { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+
+    /* Search Bar Destacada */
+    .search-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-subtle);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 9px 14px;
+      transition: 0.15s;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-box input {
+      border: none;
+      background: transparent;
+      width: 100%;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .btn-clear-search {
+      background: #e2e8f0;
+      color: #475569;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 9px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+    }
+    .btn-clear-search:hover { background: #cbd5e1; color: var(--text-main); }
+
+    .search-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-actions select {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      color: var(--text-main);
+      padding: 9px 13px;
+      border-radius: 10px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .search-counter {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 0 6px;
+    }
+
+    /* Toolbar & Export Bar */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-card);
+      padding: 5px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 13px;
+      border-radius: 8px;
+      font-size: 0.81rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: 0.15s;
+    }
+
+    .tab-btn:hover { background: var(--bg-base); color: var(--text-main); }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .tab-count {
+      background: rgba(15, 23, 42, 0.08);
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .tab-btn.active .tab-count {
+      background: rgba(255, 255, 255, 0.22);
+      color: #fff;
+    }
+
+    .export-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn-export {
+      border: 1px solid transparent;
+      padding: 8px 13px;
+      border-radius: 9px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.15s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-export-pending {
+      background: var(--warning-bg);
+      color: #92400e;
+      border-color: var(--warning-border);
+    }
+    .btn-export-pending:hover { background: #fef3c7; }
+
+    .btn-export-done {
+      background: var(--success-bg);
+      color: #065f46;
+      border-color: var(--success-border);
+    }
+    .btn-export-done:hover { background: #d1fae5; }
+
+    .btn-copy-sap {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 8px 13px;
+      border-radius: 9px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-copy-sap:hover { background: #1d4ed8; }
+
+    /* Table */
+    .table-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.73rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+
+    .mono { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.73rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pill-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+    .pill-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+    .pill-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+    .pill-info { background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); }
+    .pill-mto { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+    .pill-mts { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+    .progress-bar {
+      width: 90px;
+      height: 7px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .progress-fill { height: 100%; border-radius: 999px; }
+
+    .empty-state {
+      text-align: center;
+      padding: 54px 20px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <h1>PCP — Controle de Produção <span class="badge-area">MTG FAB.</span></h1>
+      <p>Cruzamento Plano Mensal (MONTAGEM) × Apontamento SAP (COOIS)</p>
+    </div>
+    <div class="controls-top">
+      <div class="date-box">
+        <span>Data Base:</span>
+        <input type="date" id="refDateInput" />
+      </div>
+    </div>
+  </header>
+
+  <section class="upload-grid">
+    <label class="upload-card" id="cardPlano">
+      <div class="upload-info">
+        <h3>1. Plano de Produção (Aba MONTAGEM)</h3>
+        <p id="planoFileName">Clique para selecionar a planilha do plano (.xlsx)</p>
+      </div>
+      <span class="upload-status" id="planoStatus">Aguardando</span>
+      <input type="file" id="inputPlano" accept=".xlsx,.xls,.csv" hidden />
+    </label>
+
+    <label class="upload-card" id="cardSap">
+      <div class="upload-info">
+        <h3>2. Relatório SAP (COOIS / GMEIN)</h3>
+        <p id="sapFileName">Clique para selecionar a extração do SAP (.xlsx)</p>
+      </div>
+      <span class="upload-status" id="sapStatus">Aguardando</span>
+      <input type="file" id="inputSap" accept=".xlsx,.xls,.csv" hidden />
+    </label>
+  </section>
+
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Programado até Data Base</div>
+      <div class="kpi-value mono" id="kpiProgAteHoje">0</div>
+      <div class="kpi-sub" id="kpiProgTotal">Total no plano: 0 cx</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Realizado SAP (GMEIN)</div>
+      <div class="kpi-value mono" style="color: var(--info);" id="kpiRealizado">0</div>
+      <div class="kpi-sub" id="kpiAderencia">Aderência até data: 0%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ordens Atrasadas</div>
+      <div class="kpi-value mono" style="color: var(--danger);" id="kpiAtrasadas">0</div>
+      <div class="kpi-sub" id="kpiSaldoAtraso">Déficit acumulado: 0 cx</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ordens para Encerrar (100%)</div>
+      <div class="kpi-value mono" style="color: var(--success);" id="kpiEncerrar">0</div>
+      <div class="kpi-sub">Prontas para TECO no SAP</div>
+    </div>
+  </section>
+
+  <!-- Campo de Pesquisa de Ordem ou Artigo -->
+  <section class="search-panel">
+    <div class="search-box">
+      <span style="font-size: 1rem;">🔍</span>
+      <input type="text" id="searchInput" placeholder="Pesquisar por Ordem (Wo), Artigo (SKU) ou Descrição... (separe por vírgula para buscar vários)" />
+      <button class="btn-clear-search" id="btnClearSearch" onclick="limparBusca()">Limpar ✕</button>
+    </div>
+    <div class="search-actions">
+      <span class="search-counter" id="searchCounter"></span>
+      <select id="filterClass">
+        <option value="TODOS">Classe: Todas (MTO + MTS)</option>
+        <option value="SKU MTO">Apenas SKU MTO</option>
+        <option value="SKU MTS">Apenas SKU MTS</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <div class="tabs" id="tabContainer">
+      <button class="tab-btn active" data-tab="todas">Todas <span class="tab-count" id="cntTodas">0</span></button>
+      <button class="tab-btn" data-tab="atrasadas">🔴 Atrasadas <span class="tab-count" id="cntAtrasadas">0</span></button>
+      <button class="tab-btn" data-tab="atencao">🟡 Atenção / Hoje <span class="tab-count" id="cntAtencao">0</span></button>
+      <button class="tab-btn" data-tab="prazo">🔵 No Prazo <span class="tab-count" id="cntPrazo">0</span></button>
+      <button class="tab-btn" data-tab="encerrar">🟢 Ordens para Encerrar <span class="tab-count" id="cntEncerrar">0</span></button>
+    </div>
+
+    <div class="export-group">
+      <button class="btn-copy-sap" id="btnCopiarEncerrar" onclick="copiarOrdensEncerrar()">📋 Copiar WOs p/ SAP</button>
+      <button class="btn-export btn-export-pending" onclick="exportarExcel('pendentes')">⬇ Exportar Ordens Pendentes</button>
+      <button class="btn-export btn-export-done" onclick="exportarExcel('finalizadas')">⬇ Exportar Ordens Finalizadas</button>
+    </div>
+  </section>
+
+  <section class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Ordem (Wo)</th>
+          <th>Artigo (SKU) / Descrição</th>
+          <th>Class.</th>
+          <th>Datas Programadas</th>
+          <th>Prog. até Data</th>
+          <th>Prog. Total</th>
+          <th>Realizado SAP</th>
+          <th>Saldo Pendente</th>
+          <th>% Concluído</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr>
+          <td colspan="10" class="empty-state">
+            Importe a planilha do <strong>Plano de Produção</strong> e o <strong>Relatório SAP</strong> acima para iniciar o cruzamento.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <script>
+    let rawPlanoRows = [];
+    let sapMap = new Map();
+    let consolidatedOrders = [];
+    let currentTab = 'todas';
+
+    const refDateInput = document.getElementById('refDateInput');
+    refDateInput.value = new Date().toISOString().split('T')[0];
+    refDateInput.addEventListener('change', processAndRender);
+
+    const searchInput = document.getElementById('searchInput');
+    const btnClearSearch = document.getElementById('btnClearSearch');
+
+    searchInput.addEventListener('input', () => {
+      btnClearSearch.style.display = searchInput.value.trim() ? 'inline-block' : 'none';
+      renderTable();
+    });
+
+    function limparBusca() {
+      searchInput.value = '';
+      btnClearSearch.style.display = 'none';
+      searchInput.focus();
+      renderTable();
+    }
+
+    document.getElementById('filterClass').addEventListener('change', renderTable);
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab = btn.dataset.tab;
+        document.getElementById('btnCopiarEncerrar').style.display = currentTab === 'encerrar' ? 'inline-flex' : 'none';
+        renderTable();
+      });
+    });
+
+    function parseExcelDate(val) {
+      if (!val) return null;
+      if (typeof val === 'number') {
+        const utcDays = Math.floor(val - 25569);
+        const dateObj = new Date(utcDays * 86400 * 1000);
+        return dateObj.toISOString().split('T')[0];
+      }
+      const str = String(val).trim();
+      const brMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (brMatch) {
+        return `${brMatch[3]}-${brMatch[2].padStart(2, '0')}-${brMatch[1].padStart(2, '0')}`;
+      }
+      const meses = { jan:'01', fev:'02', mar:'03', abr:'04', mai:'05', jun:'06', jul:'07', ago:'08', set:'09', out:'10', nov:'11', dez:'12' };
+      const ptMatch = str.toLowerCase().match(/^(\d{1,2})[-\/]([a-z]{3})$/);
+      if (ptMatch && meses[ptMatch[2]]) {
+        const year = new Date().getFullYear();
+        return `${year}-${meses[ptMatch[2]]}-${ptMatch[1].padStart(2, '0')}`;
+      }
+      return null;
+    }
+
+    function formatDateBR(iso) {
+      if (!iso) return '-';
+      const [y, m, d] = iso.split('-');
+      return `${d}/${m}`;
+    }
+
+    function parseNumber(val) {
+      if (typeof val === 'number') return val;
+      if (!val) return 0;
+      const cleaned = String(val).replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+      return parseFloat(cleaned) || 0;
+    }
+
+    function normalizeKey(str) {
+      return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    }
+
+    // 1. Leitura do Plano (Aba MONTAGEM)
+    document.getElementById('inputPlano').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const wb = XLSX.read(evt.target.result, { type: 'array' });
+        const sheetName = wb.SheetNames.find(n => n.toUpperCase().includes('MONTAGEM')) || wb.SheetNames[0];
+        const ws = wb.Sheets[sheetName];
+        const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+        let headerIdx = matrix.findIndex(row =>
+          row.some(cell => normalizeKey(cell) === 'wo') &&
+          row.some(cell => normalizeKey(cell) === 'item')
+        );
+
+        if (headerIdx === -1) {
+          alert('Não encontrei as colunas "Wo" e "Item" na aba ' + sheetName);
+          return;
+        }
+
+        const headers = matrix[headerIdx].map(h => normalizeKey(h));
+        const col = {
+          data: headers.findIndex(h => h === 'data'),
+          area: headers.findIndex(h => h === 'area'),
+          wo: headers.findIndex(h => h === 'wo'),
+          cxh: headers.findIndex(h => h.includes('cx/h')),
+          etq: headers.findIndex(h => h.includes('etiquetagem')),
+          item: headers.findIndex(h => h === 'item'),
+          obs: headers.findIndex(h => h.includes('observa')),
+          qtd: headers.findIndex(h => h === 'qtd'),
+          classe: headers.findIndex(h => h.includes('class')),
+          cliente: headers.findIndex(h => h.includes('cliente'))
+        };
+
+        rawPlanoRows = [];
+        for (let i = headerIdx + 1; i < matrix.length; i++) {
+          const r = matrix[i];
+          const wo = String(r[col.wo] || '').trim();
+          const item = String(r[col.item] || '').trim();
+          const qtd = parseNumber(r[col.qtd]);
+          const dataIso = parseExcelDate(r[col.data]);
+
+          if (!wo || !item || qtd <= 0 || !dataIso) continue;
+
+          rawPlanoRows.push({
+            wo,
+            item,
+            dataIso,
+            area: String(r[col.area] || '').trim(),
+            cxh: parseNumber(r[col.cxh]),
+            etq: String(r[col.etq] || '').trim(),
+            obs: String(r[col.obs] || '').trim(),
+            qtd,
+            classe: String(r[col.classe] || '').trim(),
+            cliente: String(r[col.cliente] || '').trim()
+          });
+        }
+
+        document.getElementById('cardPlano').classList.add('loaded');
+        document.getElementById('planoFileName').textContent = `${file.name} (${rawPlanoRows.length} linhas lidas)`;
+        document.getElementById('planoStatus').textContent = 'Carregado ✓';
+        processAndRender();
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    // 2. Leitura do Relatório SAP
+    document.getElementById('inputSap').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const wb = XLSX.read(evt.target.result, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+        let headerIdx = matrix.findIndex(row =>
+          row.some(cell => normalizeKey(cell) === 'ordem') &&
+          row.some(cell => normalizeKey(cell).includes('boa confirmada'))
+        );
+
+        if (headerIdx === -1) {
+          alert('Não encontrei as colunas "Ordem" e "Quantidade boa confirmada" no relatório SAP.');
+          return;
+        }
+
+        const headers = matrix[headerIdx].map(h => normalizeKey(h));
+        const col = {
+          ordem: headers.findIndex(h => h === 'ordem'),
+          material: headers.findIndex(h => h === 'material'),
+          desc: headers.findIndex(h => h.includes('texto breve')),
+          qtdOrdem: headers.findIndex(h => h.includes('quantidade da ordem')),
+          qtdBoa: headers.findIndex(h => h.includes('boa confirmada')),
+          conclusao: headers.findIndex(h => h.includes('conclusao'))
+        };
+
+        sapMap.clear();
+        for (let i = headerIdx + 1; i < matrix.length; i++) {
+          const r = matrix[i];
+          const ordem = String(r[col.ordem] || '').trim();
+          if (!ordem) continue;
+
+          sapMap.set(ordem, {
+            material: String(r[col.material] || '').trim(),
+            desc: String(r[col.desc] || '').trim(),
+            qtdOrdemSap: parseNumber(r[col.qtdOrdem]),
+            qtdBoa: parseNumber(r[col.qtdBoa]),
+            dataConclusao: parseExcelDate(r[col.conclusao])
+          });
+        }
+
+        document.getElementById('cardSap').classList.add('loaded');
+        document.getElementById('sapFileName').textContent = `${file.name} (${sapMap.size} ordens SAP)`;
+        document.getElementById('sapStatus').textContent = 'Atualizado ✓';
+        processAndRender();
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    // 3. Motor de Cruzamento
+    function processAndRender() {
+      if (rawPlanoRows.length === 0) return;
+
+      const refDate = refDateInput.value;
+      const grouped = new Map();
+
+      rawPlanoRows.forEach(row => {
+        if (!grouped.has(row.wo)) {
+          grouped.set(row.wo, {
+            wo: row.wo,
+            item: row.item,
+            classe: row.classe,
+            obs: row.obs,
+            cliente: row.cliente,
+            cxh: row.cxh,
+            datas: [],
+            progTotal: 0,
+            progAteData: 0
+          });
+        }
+        const entry = grouped.get(row.wo);
+        entry.progTotal += row.qtd;
+        if (row.dataIso <= refDate) {
+          entry.progAteData += row.qtd;
+        }
+        entry.datas.push({ dataIso: row.dataIso, qtd: row.qtd });
+      });
+
+      consolidatedOrders = [];
+      let totalProgAteHoje = 0;
+      let totalProgPlano = 0;
+      let totalRealizado = 0;
+      let deficitAtraso = 0;
+
+      grouped.forEach(ord => {
+        ord.datas.sort((a, b) => a.dataIso.localeCompare(b.dataIso));
+        const sapInfo = sapMap.get(ord.wo);
+        const realizado = sapInfo ? sapInfo.qtdBoa : 0;
+        const desc = sapInfo && sapInfo.desc ? sapInfo.desc : (ord.obs || 'Sem descrição SAP');
+        const saldo = Math.max(0, ord.progTotal - realizado);
+        const pct = ord.progTotal > 0 ? Math.min(100, Math.round((realizado / ord.progTotal) * 100)) : 0;
+
+        let status = 'prazo';
+        const primeiraData = ord.datas[0].dataIso;
+        const ultimaData = ord.datas[ord.datas.length - 1].dataIso;
+
+        if (realizado >= ord.progTotal && ord.progTotal > 0) {
+          status = 'encerrar';
+        } else if (realizado < ord.progAteData && ultimaData < refDate) {
+          status = 'atrasadas';
+          deficitAtraso += (ord.progAteData - realizado);
+        } else if (realizado < ord.progAteData && primeiraData <= refDate) {
+          status = primeiraData < refDate ? 'atrasadas' : 'atencao';
+          if (status === 'atrasadas') deficitAtraso += (ord.progAteData - realizado);
+        } else if (ord.datas.some(d => d.dataIso === refDate)) {
+          status = 'atencao';
+        }
+
+        totalProgAteHoje += ord.progAteData;
+        totalProgPlano += ord.progTotal;
+        totalRealizado += Math.min(realizado, ord.progTotal);
+
+        consolidatedOrders.push({
+          ...ord,
+          desc,
+          realizado,
+          saldo,
+          pct,
+          status
+        });
+      });
+
+      const pesoStatus = { atrasadas: 1, atencao: 2, prazo: 3, encerrar: 4 };
+      consolidatedOrders.sort((a, b) => pesoStatus[a.status] - pesoStatus[b.status] || a.datas[0].dataIso.localeCompare(b.datas[0].dataIso));
+
+      document.getElementById('kpiProgAteHoje').textContent = totalProgAteHoje.toLocaleString('pt-BR');
+      document.getElementById('kpiProgTotal').textContent = `Total no plano: ${totalProgPlano.toLocaleString('pt-BR')} cx`;
+      document.getElementById('kpiRealizado').textContent = totalRealizado.toLocaleString('pt-BR');
+      const aderencia = totalProgAteHoje > 0 ? Math.round((totalRealizado / totalProgAteHoje) * 100) : 0;
+      document.getElementById('kpiAderencia').textContent = `Aderência até data: ${aderencia}%`;
+
+      const qtdAtrasadas = consolidatedOrders.filter(o => o.status === 'atrasadas').length;
+      const qtdEncerrar = consolidatedOrders.filter(o => o.status === 'encerrar').length;
+      document.getElementById('kpiAtrasadas').textContent = qtdAtrasadas;
+      document.getElementById('kpiSaldoAtraso').textContent = `Déficit acumulado: ${deficitAtraso.toLocaleString('pt-BR')} cx`;
+      document.getElementById('kpiEncerrar').textContent = qtdEncerrar;
+
+      document.getElementById('cntTodas').textContent = consolidatedOrders.length;
+      document.getElementById('cntAtrasadas').textContent = qtdAtrasadas;
+      document.getElementById('cntAtencao').textContent = consolidatedOrders.filter(o => o.status === 'atencao').length;
+      document.getElementById('cntPrazo').textContent = consolidatedOrders.filter(o => o.status === 'prazo').length;
+      document.getElementById('cntEncerrar').textContent = qtdEncerrar;
+
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      const rawQuery = normalizeKey(searchInput.value);
+      const classFilter = document.getElementById('filterClass').value;
+
+      // Permite buscar múltiplos termos separados por vírgula ou ponto-e-vírgula
+      const terms = rawQuery.split(/[,;]+/).map(t => t.trim()).filter(Boolean);
+
+      const filtered = consolidatedOrders.filter(o => {
+        if (currentTab !== 'todas' && o.status !== currentTab) return false;
+        if (classFilter !== 'TODOS' && o.classe.toUpperCase() !== classFilter) return false;
+        if (terms.length > 0) {
+          const hay = normalizeKey(`${o.wo} ${o.item} ${o.desc} ${o.cliente}`);
+          const matched = terms.some(term => hay.includes(term));
+          if (!matched) return false;
+        }
+        return true;
+      });
+
+      const counterEl = document.getElementById('searchCounter');
+      if (consolidatedOrders.length > 0) {
+        counterEl.textContent = `Exibindo ${filtered.length} de ${consolidatedOrders.length} ordens`;
+      } else {
+        counterEl.textContent = '';
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="empty-state">Nenhuma ordem ou artigo encontrado neste filtro.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(o => {
+        const badgeMap = {
+          atrasadas: `<span class="pill pill-danger">🔴 Atrasada</span>`,
+          atencao: `<span class="pill pill-warning">🟡 Atenção / Hoje</span>`,
+          prazo: `<span class="pill pill-info">🔵 No Prazo</span>`,
+          encerrar: `<span class="pill pill-success">🟢 Encerrar (100%)</span>`
+        };
+        const barColor = o.status === 'encerrar' ? 'var(--success)' : o.status === 'atrasadas' ? 'var(--danger)' : 'var(--accent)';
+        const datasStr = o.datas.map(d => `${formatDateBR(d.dataIso)} (${d.qtd.toLocaleString('pt-BR')})`).join(' • ');
+        const classBadge = o.classe.includes('MTO') ? `<span class="pill pill-mto">MTO</span>` : `<span class="pill pill-mts">MTS</span>`;
+
+        return `
+          <tr>
+            <td>${badgeMap[o.status]}</td>
+            <td class="mono">${o.wo}</td>
+            <td>
+              <div style="font-weight:700; color:var(--text-main);">${o.item}</div>
+              <div style="font-size:0.76rem; color:var(--text-muted);">${o.desc}</div>
+            </td>
+            <td>${classBadge}</td>
+            <td style="font-size:0.78rem; color:var(--text-muted); max-width:220px;">${datasStr}</td>
+            <td class="mono">${o.progAteData.toLocaleString('pt-BR')}</td>
+            <td class="mono">${o.progTotal.toLocaleString('pt-BR')}</td>
+            <td class="mono" style="color:var(--info);">${o.realizado.toLocaleString('pt-BR')}</td>
+            <td class="mono" style="color:${o.saldo > 0 ? 'var(--danger)' : 'var(--success)'};">${o.saldo.toLocaleString('pt-BR')}</td>
+            <td>
+              <div class="mono" style="font-size:0.78rem;">${o.pct}%</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${o.pct}%; background:${barColor};"></div></div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function copiarOrdensEncerrar() {
+      const lista = consolidatedOrders.filter(o => o.status === 'encerrar').map(o => o.wo).join('\n');
+      if (!lista) return alert('Não há ordens 100% concluídas para copiar.');
+      navigator.clipboard.writeText(lista);
+      alert('Lista de ordens (Wo) copiada! Cole direto na seleção múltipla da COOIS no SAP.');
+    }
+
+    function exportarExcel(tipo) {
+      if (consolidatedOrders.length === 0) {
+        return alert('Importe o Plano de Produção e o Relatório SAP antes de exportar.');
+      }
+
+      const lista = tipo === 'finalizadas'
+        ? consolidatedOrders.filter(o => o.status === 'encerrar')
+        : consolidatedOrders.filter(o => o.status !== 'encerrar');
+
+      if (lista.length === 0) {
+        return alert(tipo === 'finalizadas'
+          ? 'Não há ordens finalizadas (100%) para exportar.'
+          : 'Não há ordens pendentes para exportar.');
+      }
+
+      const labelStatus = {
+        atrasadas: 'ATRASADA',
+        atencao: 'ATENÇÃO / HOJE',
+        prazo: 'NO PRAZO',
+        encerrar: 'CONCLUÍDA (ENCERRAR SAP)'
+      };
+
+      const rows = lista.map(o => ({
+        'Status': labelStatus[o.status],
+        'Ordem (Wo)': o.wo,
+        'Artigo (SKU)': o.item,
+        'Descrição': o.desc,
+        'Classificação': o.classe,
+        'Cliente / Solicitante': o.cliente || '-',
+        'Datas Programadas': o.datas.map(d => `${formatDateBR(d.dataIso)} (${d.qtd})`).join(' | '),
+        'Programado até Data Base': o.progAteData,
+        'Programado Total': o.progTotal,
+        'Realizado SAP (GMEIN)': o.realizado,
+        'Saldo Pendente': o.saldo,
+        '% Concluído': `${o.pct}%`
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      const nomeAba = tipo === 'finalizadas' ? 'Ordens_Finalizadas' : 'Ordens_Pendentes';
+      XLSX.utils.book_append_sheet(wb, ws, nomeAba);
+
+      const dataArquivo = refDateInput.value || new Date().toISOString().split('T')[0];
+      XLSX.writeFile(wb, `PCP_MTG_FAB_${nomeAba}_${dataArquivo}.xlsx`);
+    }
+  </script>
+</body>
+</html>
