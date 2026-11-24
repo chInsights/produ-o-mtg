@@ -12,6 +12,7 @@ let db = null;
 
 let rawPlanoRows = [];
 let sapMap = new Map();
+let observacoesMap = {}; // Mapa leve: { "WO_1000018613": "Falta vidro", ... }
 let consolidatedOrders = [];
 let currentTab = 'todas';
 
@@ -90,7 +91,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 // =========================================================================
-// 3. FUNÇÕES AUXILIARES DE DATA E NÚMERO
+// 3. FUNÇÕES AUXILIARES DE DATA, NÚMERO E TEXTO
 // =========================================================================
 function parseExcelDate(val) {
   if (!val) return null;
@@ -143,6 +144,14 @@ function parseNumber(val) {
 
 function normalizeKey(str) {
   return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 function getNowBR() {
@@ -233,6 +242,9 @@ function processarArquivoPlano(file) {
       }
 
       rawPlanoRows = parsedRows;
+      // Limpa localmente as observações ao carregar nova planilha mensal
+      observacoesMap = {};
+
       const totalCxLido = rawPlanoRows.reduce((acc, r) => acc + r.qtd, 0);
 
       document.getElementById('cardPlano').classList.add('loaded');
@@ -320,7 +332,7 @@ function processarArquivoSap(file) {
 }
 
 // =========================================================================
-// 5. FIREBASE FIRESTORE (NÃO BLOQUEANTE)
+// 5. FIREBASE FIRESTORE (PLANO, SAP E OBSERVAÇÕES LEVES)
 // =========================================================================
 async function savePlanoToCloud(fileName, rows) {
   if (!db) return;
@@ -347,9 +359,15 @@ async function savePlanoToCloud(fileName, rows) {
       totalChunks
     });
 
+    // Reset automático das observações do mês anterior ao subir novo plano
+    await db.collection(COLLECTION_NAME).doc("observacoes").set({
+      notas: {},
+      resetAt: nowStr
+    });
+
     badge.className = "cloud-badge online";
     badge.textContent = "☁️ Nuvem Sincronizada";
-    meta.textContent = `☁️ Salvo na nuvem em ${nowStr}`;
+    meta.textContent = `☁️ Salvo na nuvem em ${nowStr} (Obs. resetadas)`;
   } catch (err) {
     console.error("Erro ao salvar plano:", err);
     badge.className = "cloud-badge offline";
@@ -382,6 +400,48 @@ async function saveSapToCloud(fileName, entriesObj) {
     badge.className = "cloud-badge offline";
     badge.textContent = "⚠️ Falha ao salvar na nuvem";
     meta.textContent = `Erro nuvem: ${err.code || err.message}`;
+  }
+}
+
+async function salvarObservacao(groupKey, inputEl) {
+  const texto = String(inputEl.value || '').trim();
+  const anterior = observacoesMap[groupKey] || '';
+
+  // Visual instantâneo no campo
+  if (texto) {
+    inputEl.classList.add('has-note');
+  } else {
+    inputEl.classList.remove('has-note');
+  }
+
+  // Se não houve alteração real, não gasta escrita no banco
+  if (texto === anterior) return;
+
+  if (texto) {
+    observacoesMap[groupKey] = texto;
+  } else {
+    delete observacoesMap[groupKey];
+  }
+
+  // Atualiza também no array em memória para filtro/exportação
+  const ordObj = consolidatedOrders.find(o => o.groupKey === groupKey);
+  if (ordObj) ordObj.notaPcp = texto;
+
+  if (!db) return;
+
+  try {
+    await db.collection(COLLECTION_NAME).doc("observacoes").set({
+      notas: observacoesMap,
+      updatedAt: getNowBR()
+    });
+
+    const icon = inputEl.parentElement.querySelector('.obs-saved-icon');
+    if (icon) {
+      icon.classList.add('show');
+      setTimeout(() => icon.classList.remove('show'), 1400);
+    }
+  } catch (err) {
+    console.error("Erro ao salvar observação:", err);
   }
 }
 
@@ -424,11 +484,18 @@ async function initCloudSync() {
       const data = sapSnap.data();
       sapMap = new Map(Object.entries(data.entries || {}));
       document.getElementById('cardSap').classList.add('loaded');
-      document.getElementById('sapFileName').textContent = `${data.fileName} (${sapMap.size} ordens SAP)`;
+      const nomeSap = data.fileName || 'COOIS_1502_ATUAL.xlsx';
+      document.getElementById('sapFileName').textContent = `${nomeSap} (${sapMap.size} ordens SAP)`;
       document.getElementById('sapCloudMeta').textContent = `☁️ Carregado da nuvem (${data.updatedAt})`;
       document.getElementById('sapStatus').textContent = 'Na Nuvem ✓';
     } else if (!sapSnap.exists) {
       document.getElementById('sapCloudMeta').textContent = "Nenhuma extração SAP salva ainda.";
+    }
+
+    // Carrega o documento leve de observações
+    const obsSnap = await db.collection(COLLECTION_NAME).doc("observacoes").get();
+    if (obsSnap.exists) {
+      observacoesMap = obsSnap.data().notas || {};
     }
 
     badge.className = "cloud-badge online";
@@ -464,6 +531,7 @@ function processAndRender() {
 
     if (!grouped.has(groupKey)) {
       grouped.set(groupKey, {
+        groupKey,
         wo: row.wo || '',
         hasWo: Boolean(row.wo),
         bloco: row.bloco,
@@ -510,7 +578,6 @@ function processAndRender() {
     const sapInfo = ord.hasWo ? sapMap.get(ord.wo) : null;
     const realizado = sapInfo ? sapInfo.qtdBoa : 0;
 
-    // Usa "Quantidade da ordem (GMEIN)" do SAP como alvo oficial da ordem; se não houver no SAP, usa progTotal
     const qtdOrdemAlvo = (sapInfo && sapInfo.qtdOrdemSap > 0) ? sapInfo.qtdOrdemSap : ord.progTotal;
     const hasSapOrder = Boolean(sapInfo && sapInfo.qtdOrdemSap > 0);
 
@@ -518,7 +585,6 @@ function processAndRender() {
     const saldo = Math.max(0, qtdOrdemAlvo - realizado);
     const pct = qtdOrdemAlvo > 0 ? Math.min(100, Math.round((realizado / qtdOrdemAlvo) * 100)) : 0;
 
-    // Se a ordem no SAP for maior que o lançado no plano atual, o esperado até a data também considera essa diferença
     const jaRealizadoAntesDoPlano = Math.max(0, qtdOrdemAlvo - ord.progTotal);
     const metaAcumuladaAteData = jaRealizadoAntesDoPlano + ord.progAteData;
 
@@ -557,7 +623,8 @@ function processAndRender() {
       realizado,
       saldo,
       pct,
-      status
+      status,
+      notaPcp: observacoesMap[ord.groupKey] || ''
     });
   });
 
@@ -601,7 +668,7 @@ function renderTable() {
   const filtered = consolidatedOrders.filter(o => {
     if (currentTab !== 'todas' && o.status !== currentTab) return false;
     if (terms.length > 0) {
-      const hay = normalizeKey(`${o.wo} ${o.item} ${o.desc} ${o.cliente} ${o.demanda}`);
+      const hay = normalizeKey(`${o.wo} ${o.item} ${o.desc} ${o.cliente} ${o.demanda} ${o.notaPcp}`);
       const matched = terms.some(term => hay.includes(term));
       if (!matched) return false;
     }
@@ -618,7 +685,7 @@ function renderTable() {
   }
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="12" class="empty-state">Nenhuma ordem ou artigo encontrado neste filtro.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="13" class="empty-state">Nenhuma ordem ou artigo encontrado neste filtro.</td></tr>`;
     return;
   }
 
@@ -639,6 +706,9 @@ function renderTable() {
     const sapOrdemCol = o.hasSapOrder
       ? `<span class="mono" style="${diffOrdemPlano ? 'color:var(--warning); font-weight:800;' : ''}">${o.qtdOrdemAlvo.toLocaleString('pt-BR')}</span>`
       : `<span style="color:var(--text-muted); font-size:0.76rem;">—</span>`;
+
+    const notaAtual = escapeHtml(o.notaPcp);
+    const notaClass = o.notaPcp ? 'obs-input has-note' : 'obs-input';
 
     return `
       <tr>
@@ -663,6 +733,20 @@ function renderTable() {
         <td>
           <div class="mono" style="font-size:0.77rem;">${o.pct}%</div>
           <div class="progress-bar"><div class="progress-fill" style="width:${o.pct}%; background:${barColor};"></div></div>
+        </td>
+        <td class="obs-cell">
+          <div class="obs-input-wrap">
+            <input
+              type="text"
+              class="${notaClass}"
+              value="${notaAtual}"
+              placeholder="+ Obs..."
+              title="${notaAtual || 'Clique para adicionar observação'}"
+              onblur="salvarObservacao('${o.groupKey}', this)"
+              onkeydown="if(event.key==='Enter'){this.blur();}"
+            />
+            <span class="obs-saved-icon">✓</span>
+          </div>
         </td>
       </tr>
     `;
@@ -715,7 +799,8 @@ function exportarExcel(tipo) {
     'Horas Programadas': Number(o.horasTotal.toFixed(2)),
     'Realizado SAP (GMEIN)': o.realizado,
     'Saldo Pendente Ordem (Cx)': o.saldo,
-    '% Concluído Ordem': `${o.pct}%`
+    '% Concluído Ordem': `${o.pct}%`,
+    'Observação PCP': o.notaPcp || ''
   }));
 
   const ws = XLSX.utils.json_to_sheet(rows);

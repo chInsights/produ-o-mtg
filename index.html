@@ -448,6 +448,58 @@
     }
     .progress-fill { height: 100%; border-radius: 999px; }
 
+    /* Campo discreto de Observação PCP */
+    .obs-cell {
+      min-width: 175px;
+      max-width: 230px;
+    }
+    .obs-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .obs-input {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      padding: 5px 8px;
+      font-size: 0.78rem;
+      color: var(--text-main);
+      transition: 0.15s;
+    }
+    .obs-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+    .obs-input:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-subtle);
+    }
+    .obs-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: #ffffff;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+    }
+    .obs-input.has-note {
+      background: var(--warning-bg);
+      border-color: var(--warning-border);
+      color: #92400e;
+      font-weight: 600;
+    }
+    .obs-saved-icon {
+      font-size: 0.75rem;
+      color: var(--success);
+      font-weight: 800;
+      opacity: 0;
+      transition: opacity 0.25s;
+      user-select: none;
+    }
+    .obs-saved-icon.show {
+      opacity: 1;
+    }
+
     .empty-state {
       text-align: center;
       padding: 54px 20px;
@@ -529,7 +581,7 @@
   <section class="search-panel">
     <div class="search-box">
       <span style="font-size: 1rem;">🔍</span>
-      <input type="text" id="searchInput" placeholder="Pesquisar por Ordem (Wo), Artigo (SKU), Demanda ou Descrição... (separe por vírgula)" />
+      <input type="text" id="searchInput" placeholder="Pesquisar por Ordem (Wo), Artigo (SKU), Demanda, Descrição ou Observação... (separe por vírgula)" />
       <button class="btn-clear-search" id="btnClearSearch" onclick="limparBusca()">Limpar ✕</button>
     </div>
     <div class="search-actions">
@@ -580,11 +632,12 @@
           <th>Realizado SAP</th>
           <th>Saldo Ordem</th>
           <th>% Ordem</th>
+          <th>Observação PCP</th>
         </tr>
       </thead>
       <tbody id="tableBody">
         <tr>
-          <td colspan="12" class="empty-state">
+          <td colspan="13" class="empty-state">
             Importe a planilha do <strong>Plano de Produção</strong> e o <strong>Relatório SAP</strong> acima para iniciar o cruzamento.
           </td>
         </tr>
