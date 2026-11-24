@@ -10,11 +10,29 @@ const firebaseConfig = {
 const COLLECTION_NAME = "pcp_mtg_fab";
 let db = null;
 
+const MOTIVOS_PADRONIZADOS = [
+  "Atraso do Fornecedor",
+  "Eficiência",
+  "Falta de Abastecimento / Insumos",
+  "Falta de Abastecimento / Vidro",
+  "Falta de Etiqueta",
+  "Fora do Programado",
+  "Manutenção de Equipamento",
+  "Ordem Virada de Mês",
+  "Perda no Processo",
+  "Programação / PCP",
+  "Refugo de Insumos",
+  "Reprogramação",
+  "Velocidade Reduzida",
+  "Vidro Molhado"
+];
+
 let rawPlanoRows = [];
 let sapMap = new Map();
-let observacoesMap = {}; // Mapa leve: { "WO_1000018613": "Falta vidro", ... }
+let observacoesMap = {}; // Mapa leve: { "WO_1000018613": "Falta de Abastecimento / Vidro | Eficiência" }
 let consolidatedOrders = [];
 let currentTab = 'todas';
+let activeMotivoGroupKey = null;
 
 // =========================================================================
 // 1. CONTROLE DE SELETOR DE ARQUIVOS E DRAG & DROP
@@ -88,6 +106,15 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     document.getElementById('btnCopiarEncerrar').style.display = currentTab === 'encerrar' ? 'inline-flex' : 'none';
     renderTable();
   });
+});
+
+// Fecha o menu suspenso de motivos se clicar fora dele
+document.addEventListener('click', (e) => {
+  const pop = document.getElementById('motivoPopover');
+  if (!pop || !pop.classList.contains('open')) return;
+  if (!pop.contains(e.target) && !e.target.closest('.motivo-trigger')) {
+    aplicarMotivosOrdem();
+  }
 });
 
 // =========================================================================
@@ -332,8 +359,111 @@ function processarArquivoSap(file) {
 }
 
 // =========================================================================
-// 5. FIREBASE FIRESTORE (PLANO, SAP E OBSERVAÇÕES LEVES)
+// 5. FIREBASE FIRESTORE & MENU SUSPENSO DE MÚLTIPLOS MOTIVOS
 // =========================================================================
+function abrirMenuMotivos(groupKey, btnEl) {
+  activeMotivoGroupKey = groupKey;
+  const pop = document.getElementById('motivoPopover');
+  const listEl = document.getElementById('motivoOptionsList');
+  const extraInput = document.getElementById('motivoExtraInput');
+  const titleEl = document.getElementById('motivoPopoverTitle');
+
+  const ord = consolidatedOrders.find(o => o.groupKey === groupKey);
+  titleEl.textContent = ord && ord.wo ? `Ordem ${ord.wo}` : 'Motivos PCP';
+
+  const valorAtual = observacoesMap[groupKey] || '';
+  const partes = valorAtual ? valorAtual.split(' | ').map(s => s.trim()).filter(Boolean) : [];
+  const selecionados = new Set(partes.filter(p => MOTIVOS_PADRONIZADOS.includes(p)));
+  const extras = partes.filter(p => !MOTIVOS_PADRONIZADOS.includes(p));
+
+  listEl.innerHTML = MOTIVOS_PADRONIZADOS.map(motivo => `
+    <label class="motivo-option">
+      <input type="checkbox" value="${escapeHtml(motivo)}" ${selecionados.has(motivo) ? 'checked' : ''} />
+      <span>${escapeHtml(motivo)}</span>
+    </label>
+  `).join('');
+
+  extraInput.value = extras.join(' | ');
+  extraInput.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      aplicarMotivosOrdem();
+    }
+  };
+
+  pop.classList.add('open');
+
+  // Posiciona o menu próximo ao botão sem sair da tela
+  const rect = btnEl.getBoundingClientRect();
+  const popWidth = 295;
+  const popHeight = 365;
+  let left = rect.right - popWidth;
+  if (left < 12) left = 12;
+  let top = rect.bottom + 4;
+  if (top + popHeight > window.innerHeight - 10) {
+    top = Math.max(10, rect.top - popHeight - 4);
+  }
+  pop.style.left = `${left}px`;
+  pop.style.top = `${top}px`;
+}
+
+function fecharMenuMotivos() {
+  const pop = document.getElementById('motivoPopover');
+  if (pop) pop.classList.remove('open');
+  activeMotivoGroupKey = null;
+}
+
+function limparMotivosOrdem() {
+  if (!activeMotivoGroupKey) return;
+  const key = activeMotivoGroupKey;
+  fecharMenuMotivos();
+  persistirObservacao(key, '');
+}
+
+function aplicarMotivosOrdem() {
+  if (!activeMotivoGroupKey) return;
+  const key = activeMotivoGroupKey;
+  const listEl = document.getElementById('motivoOptionsList');
+  const extraInput = document.getElementById('motivoExtraInput');
+
+  const marcados = Array.from(listEl.querySelectorAll('input[type="checkbox"]:checked'))
+    .map(cb => cb.value.trim())
+    .filter(Boolean);
+
+  const extraTexto = String(extraInput.value || '').trim();
+  if (extraTexto) marcados.push(extraTexto);
+
+  const textoFinal = marcados.join(' | ');
+  fecharMenuMotivos();
+  persistirObservacao(key, textoFinal);
+}
+
+async function persistirObservacao(groupKey, textoFinal) {
+  const anterior = observacoesMap[groupKey] || '';
+  if (textoFinal === anterior) return;
+
+  if (textoFinal) {
+    observacoesMap[groupKey] = textoFinal;
+  } else {
+    delete observacoesMap[groupKey];
+  }
+
+  const ordObj = consolidatedOrders.find(o => o.groupKey === groupKey);
+  if (ordObj) ordObj.notaPcp = textoFinal;
+
+  renderTable();
+
+  if (!db) return;
+  try {
+    await db.collection(COLLECTION_NAME).doc("observacoes").set({
+      notas: observacoesMap,
+      updatedAt: getNowBR()
+    });
+  } catch (err) {
+    console.error("Erro ao salvar observação:", err);
+  }
+}
+
 async function savePlanoToCloud(fileName, rows) {
   if (!db) return;
   const badge = document.getElementById('cloudBadge');
@@ -403,48 +533,6 @@ async function saveSapToCloud(fileName, entriesObj) {
   }
 }
 
-async function salvarObservacao(groupKey, inputEl) {
-  const texto = String(inputEl.value || '').trim();
-  const anterior = observacoesMap[groupKey] || '';
-
-  // Visual instantâneo no campo
-  if (texto) {
-    inputEl.classList.add('has-note');
-  } else {
-    inputEl.classList.remove('has-note');
-  }
-
-  // Se não houve alteração real, não gasta escrita no banco
-  if (texto === anterior) return;
-
-  if (texto) {
-    observacoesMap[groupKey] = texto;
-  } else {
-    delete observacoesMap[groupKey];
-  }
-
-  // Atualiza também no array em memória para filtro/exportação
-  const ordObj = consolidatedOrders.find(o => o.groupKey === groupKey);
-  if (ordObj) ordObj.notaPcp = texto;
-
-  if (!db) return;
-
-  try {
-    await db.collection(COLLECTION_NAME).doc("observacoes").set({
-      notas: observacoesMap,
-      updatedAt: getNowBR()
-    });
-
-    const icon = inputEl.parentElement.querySelector('.obs-saved-icon');
-    if (icon) {
-      icon.classList.add('show');
-      setTimeout(() => icon.classList.remove('show'), 1400);
-    }
-  } catch (err) {
-    console.error("Erro ao salvar observação:", err);
-  }
-}
-
 async function initCloudSync() {
   const badge = document.getElementById('cloudBadge');
   if (typeof firebase === 'undefined') {
@@ -492,7 +580,6 @@ async function initCloudSync() {
       document.getElementById('sapCloudMeta').textContent = "Nenhuma extração SAP salva ainda.";
     }
 
-    // Carrega o documento leve de observações
     const obsSnap = await db.collection(COLLECTION_NAME).doc("observacoes").get();
     if (obsSnap.exists) {
       observacoesMap = obsSnap.data().notas || {};
@@ -707,8 +794,11 @@ function renderTable() {
       ? `<span class="mono" style="${diffOrdemPlano ? 'color:var(--warning); font-weight:800;' : ''}">${o.qtdOrdemAlvo.toLocaleString('pt-BR')}</span>`
       : `<span style="color:var(--text-muted); font-size:0.76rem;">—</span>`;
 
-    const notaAtual = escapeHtml(o.notaPcp);
-    const notaClass = o.notaPcp ? 'obs-input has-note' : 'obs-input';
+    const listaMotivos = o.notaPcp ? o.notaPcp.split(' | ').map(s => s.trim()).filter(Boolean) : [];
+    const triggerClass = listaMotivos.length > 0 ? 'motivo-trigger has-note' : 'motivo-trigger';
+    const conteudoMotivo = listaMotivos.length > 0
+      ? `<div class="motivo-badges">${listaMotivos.map(m => `<span class="motivo-tag">${escapeHtml(m)}</span>`).join('')}</div>`
+      : `<span>+ Selecionar motivo...</span>`;
 
     return `
       <tr>
@@ -735,18 +825,10 @@ function renderTable() {
           <div class="progress-bar"><div class="progress-fill" style="width:${o.pct}%; background:${barColor};"></div></div>
         </td>
         <td class="obs-cell">
-          <div class="obs-input-wrap">
-            <input
-              type="text"
-              class="${notaClass}"
-              value="${notaAtual}"
-              placeholder="+ Obs..."
-              title="${notaAtual || 'Clique para adicionar observação'}"
-              onblur="salvarObservacao('${o.groupKey}', this)"
-              onkeydown="if(event.key==='Enter'){this.blur();}"
-            />
-            <span class="obs-saved-icon">✓</span>
-          </div>
+          <button type="button" class="${triggerClass}" onclick="abrirMenuMotivos('${o.groupKey}', this)">
+            ${conteudoMotivo}
+            <span style="font-size:0.68rem; opacity:0.7;">▼</span>
+          </button>
         </td>
       </tr>
     `;

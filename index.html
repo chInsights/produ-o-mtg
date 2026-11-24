@@ -448,56 +448,146 @@
     }
     .progress-fill { height: 100%; border-radius: 999px; }
 
-    /* Campo discreto de Observação PCP */
+    /* Seletor Suspenso Múltiplo de Motivos PCP */
     .obs-cell {
-      min-width: 175px;
-      max-width: 230px;
+      min-width: 195px;
+      max-width: 260px;
     }
-    .obs-input-wrap {
+    .motivo-trigger {
+      width: 100%;
       display: flex;
       align-items: center;
-      gap: 5px;
-    }
-    .obs-input {
-      width: 100%;
+      justify-content: space-between;
+      gap: 6px;
       background: transparent;
       border: 1px solid transparent;
-      border-radius: 7px;
+      border-radius: 8px;
       padding: 5px 8px;
-      font-size: 0.78rem;
-      color: var(--text-main);
+      font-size: 0.76rem;
+      color: #94a3b8;
+      cursor: pointer;
+      text-align: left;
       transition: 0.15s;
     }
-    .obs-input::placeholder {
-      color: #94a3b8;
-      font-style: italic;
-    }
-    .obs-input:hover {
+    .motivo-trigger:hover {
       border-color: var(--border-strong);
       background: var(--bg-subtle);
+      color: var(--text-main);
     }
-    .obs-input:focus {
-      outline: none;
-      border-color: var(--accent);
-      background: #ffffff;
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
-    }
-    .obs-input.has-note {
+    .motivo-trigger.has-note {
       background: var(--warning-bg);
       border-color: var(--warning-border);
       color: #92400e;
       font-weight: 600;
     }
-    .obs-saved-icon {
-      font-size: 0.75rem;
-      color: var(--success);
+    .motivo-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .motivo-tag {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    /* Popover flutuante único (não pesa a tabela) */
+    .motivo-popover {
+      position: fixed;
+      z-index: 9999;
+      width: 295px;
+      background: #ffffff;
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+      padding: 10px;
+      display: none;
+    }
+    .motivo-popover.open { display: block; }
+    .motivo-popover-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 7px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.74rem;
       font-weight: 800;
-      opacity: 0;
-      transition: opacity 0.25s;
+      color: var(--text-main);
+    }
+    .motivo-list {
+      max-height: 230px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .motivo-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 7px;
+      border-radius: 6px;
+      font-size: 0.77rem;
+      font-weight: 500;
+      color: var(--text-main);
+      cursor: pointer;
       user-select: none;
     }
-    .obs-saved-icon.show {
-      opacity: 1;
+    .motivo-option:hover { background: var(--accent-soft); }
+    .motivo-option input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+    }
+    .motivo-extra-box {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .motivo-extra-input {
+      width: 100%;
+      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      padding: 6px 8px;
+      font-size: 0.76rem;
+      outline: none;
+    }
+    .motivo-extra-input:focus { border-color: var(--accent); }
+    .motivo-popover-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .btn-motivo-clear {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-motivo-done {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     .empty-state {
@@ -581,7 +671,7 @@
   <section class="search-panel">
     <div class="search-box">
       <span style="font-size: 1rem;">🔍</span>
-      <input type="text" id="searchInput" placeholder="Pesquisar por Ordem (Wo), Artigo (SKU), Demanda, Descrição ou Observação... (separe por vírgula)" />
+      <input type="text" id="searchInput" placeholder="Pesquisar por Ordem (Wo), Artigo (SKU), Demanda, Descrição ou Motivo... (separe por vírgula)" />
       <button class="btn-clear-search" id="btnClearSearch" onclick="limparBusca()">Limpar ✕</button>
     </div>
     <div class="search-actions">
@@ -644,6 +734,22 @@
       </tbody>
     </table>
   </section>
+
+  <!-- Menu suspenso flutuante único para seleção múltipla de motivos -->
+  <div class="motivo-popover" id="motivoPopover">
+    <div class="motivo-popover-header">
+      <span id="motivoPopoverTitle">Motivos PCP</span>
+      <span style="cursor:pointer; color:var(--text-muted);" onclick="fecharMenuMotivos()">✕</span>
+    </div>
+    <div class="motivo-list" id="motivoOptionsList"></div>
+    <div class="motivo-extra-box">
+      <input type="text" class="motivo-extra-input" id="motivoExtraInput" placeholder="Detalhe opcional (ex: Linha 2 parada)..." />
+    </div>
+    <div class="motivo-popover-footer">
+      <button type="button" class="btn-motivo-clear" onclick="limparMotivosOrdem()">Limpar</button>
+      <button type="button" class="btn-motivo-done" onclick="aplicarMotivosOrdem()">Salvar ✓</button>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
