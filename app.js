@@ -10,6 +10,9 @@ const firebaseConfig = {
 const COLLECTION_NAME = "pcp_mtg_fab";
 let db = null;
 
+// Senha de proteção para importar Plano ou COOIS (Base64 de "pcp1502" -> altere usando btoa("nova_senha"))
+const SENHA_IMPORTACAO_B64 = "cGNwMTUwMg==";
+
 const MOTIVOS_PADRONIZADOS = [
   "Atraso do Fornecedor",
   "Eficiência",
@@ -29,15 +32,32 @@ const MOTIVOS_PADRONIZADOS = [
 
 let rawPlanoRows = [];
 let sapMap = new Map();
-let observacoesMap = {}; // Mapa leve: { "WO_1000018613": "Falta de Abastecimento / Vidro | Eficiência" }
+let observacoesMap = {};
 let consolidatedOrders = [];
 let currentTab = 'todas';
 let activeMotivoGroupKey = null;
 
 // =========================================================================
-// 1. CONTROLE DE SELETOR DE ARQUIVOS E DRAG & DROP
+// 1. VALIDAÇÃO DE SENHA PARA IMPORTAÇÃO (CLIQUE OU DRAG & DROP)
 // =========================================================================
+function verificarSenhaImportacao() {
+  if (sessionStorage.getItem("pcp_import_unlocked") === "1") {
+    return true;
+  }
+  const digitada = prompt("🔒 Área restrita do PCP.\nDigite a senha para importar ou atualizar planilhas:");
+  if (digitada === null) return false;
+
+  if (btoa(digitada.trim()) === SENHA_IMPORTACAO_B64) {
+    sessionStorage.setItem("pcp_import_unlocked", "1");
+    return true;
+  }
+
+  alert("❌ Senha incorreta! Importação bloqueada.");
+  return false;
+}
+
 function abrirSeletor(inputId) {
+  if (!verificarSenhaImportacao()) return;
   const inp = document.getElementById(inputId);
   if (inp) inp.click();
 }
@@ -54,6 +74,7 @@ function setupDragAndDrop(cardId, handlerFn) {
     e.preventDefault();
     card.classList.remove('dragover');
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      if (!verificarSenhaImportacao()) return;
       handlerFn(e.dataTransfer.files[0]);
     }
   });
@@ -80,7 +101,8 @@ document.getElementById('inputSap').addEventListener('change', (e) => {
 // 2. CONTROLES DE INTERFACE
 // =========================================================================
 const refDateInput = document.getElementById('refDateInput');
-refDateInput.value = new Date().toISOString().split('T')[0];
+const hojeLocal = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0];
+refDateInput.value = hojeLocal;
 refDateInput.addEventListener('change', processAndRender);
 
 const searchInput = document.getElementById('searchInput');
@@ -108,7 +130,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// Fecha o menu suspenso de motivos se clicar fora dele
 document.addEventListener('click', (e) => {
   const pop = document.getElementById('motivoPopover');
   if (!pop || !pop.classList.contains('open')) return;
@@ -269,7 +290,6 @@ function processarArquivoPlano(file) {
       }
 
       rawPlanoRows = parsedRows;
-      // Limpa localmente as observações ao carregar nova planilha mensal
       observacoesMap = {};
 
       const totalCxLido = rawPlanoRows.reduce((acc, r) => acc + r.qtd, 0);
@@ -393,7 +413,6 @@ function abrirMenuMotivos(groupKey, btnEl) {
 
   pop.classList.add('open');
 
-  // Posiciona o menu próximo ao botão sem sair da tela
   const rect = btnEl.getBoundingClientRect();
   const popWidth = 295;
   const popHeight = 365;
@@ -489,7 +508,6 @@ async function savePlanoToCloud(fileName, rows) {
       totalChunks
     });
 
-    // Reset automático das observações do mês anterior ao subir novo plano
     await db.collection(COLLECTION_NAME).doc("observacoes").set({
       notas: {},
       resetAt: nowStr
