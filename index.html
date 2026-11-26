@@ -43,7 +43,7 @@
       background: var(--bg-base);
       color: var(--text-main);
       min-height: 100vh;
-      padding: 22px 28px;
+      padding: 20px 24px;
     }
 
     .topbar {
@@ -55,7 +55,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 18px 22px;
+      padding: 16px 22px;
       box-shadow: var(--shadow-sm);
       margin-bottom: 16px;
     }
@@ -130,8 +130,8 @@
     .upload-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 14px;
+      margin-bottom: 16px;
     }
 
     .upload-card {
@@ -139,7 +139,7 @@
       background: var(--bg-card);
       border: 1.5px dashed var(--border-strong);
       border-radius: 14px;
-      padding: 16px 20px;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -170,8 +170,8 @@
       pointer-events: none;
     }
 
-    .upload-info h3 { font-size: 0.93rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
-    .upload-info p { font-size: 0.79rem; color: var(--text-muted); }
+    .upload-info h3 { font-size: 0.92rem; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
+    .upload-info p { font-size: 0.78rem; color: var(--text-muted); }
     .upload-meta { font-size: 0.72rem; color: var(--accent); font-weight: 600; margin-top: 4px; }
 
     .upload-status {
@@ -191,30 +191,70 @@
       border-color: var(--success-border);
     }
 
+    /* Grade compacta para manter todos os KPIs alinhados na mesma linha */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 1220px) {
+      .kpi-grid {
+        grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      }
     }
 
     .kpi-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px 18px;
+      border-radius: 12px;
+      padding: 12px 13px;
       box-shadow: var(--shadow-sm);
+      min-width: 0;
     }
 
-    .kpi-label { font-size: 0.74rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-    .kpi-value { font-size: 1.55rem; font-weight: 800; margin: 6px 0 4px; color: var(--text-main); }
-    .kpi-sub { font-size: 0.77rem; color: var(--text-muted); font-weight: 500; line-height: 1.35; }
+    .kpi-card.kpi-highlight {
+      background: #fffbeb;
+      border-color: #fcd34d;
+    }
+
+    .kpi-label {
+      font-size: 0.67rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .kpi-value {
+      font-size: 1.28rem;
+      font-weight: 800;
+      margin: 5px 0 3px;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .kpi-sub {
+      font-size: 0.71rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     .search-panel {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 14px 18px;
+      padding: 13px 18px;
       margin-bottom: 14px;
       box-shadow: var(--shadow-sm);
       display: flex;
@@ -392,7 +432,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.82rem;
+      font-size: 0.81rem;
       text-align: left;
     }
 
@@ -400,16 +440,16 @@
       background: var(--bg-subtle);
       color: var(--text-muted);
       font-weight: 700;
-      font-size: 0.72rem;
+      font-size: 0.71rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      padding: 13px 12px;
+      padding: 12px 10px;
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
 
     td {
-      padding: 11px 12px;
+      padding: 10px 10px;
       border-bottom: 1px solid var(--border);
       vertical-align: middle;
     }
@@ -439,7 +479,7 @@
     .pill-mts { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
     .progress-bar {
-      width: 85px;
+      width: 80px;
       height: 7px;
       background: #e2e8f0;
       border-radius: 999px;
@@ -450,8 +490,8 @@
 
     /* Seletor Suspenso Múltiplo de Motivos PCP */
     .obs-cell {
-      min-width: 195px;
-      max-width: 260px;
+      min-width: 190px;
+      max-width: 250px;
     }
     .motivo-trigger {
       width: 100%;
@@ -496,7 +536,7 @@
       line-height: 1.25;
     }
 
-    /* Popover flutuante único (não pesa a tabela) */
+    /* Popover flutuante único */
     .motivo-popover {
       position: fixed;
       z-index: 9999;
@@ -637,34 +677,39 @@
 
   <section class="kpi-grid">
     <div class="kpi-card">
-      <div class="kpi-label">Total Programado (Caixas)</div>
-      <div class="kpi-value mono" id="kpiProgTotal">0</div>
+      <div class="kpi-label">Prog. (Caixas)</div>
+      <div class="kpi-value mono" id="kpiProgTotal">0 cx</div>
       <div class="kpi-sub" id="kpiProgAteHoje">Até Data Base: 0 cx</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Dúzias Programadas</div>
-      <div class="kpi-value mono" style="color: var(--purple);" id="kpiDuziasTotal">0</div>
+      <div class="kpi-label">Dúzias Prog.</div>
+      <div class="kpi-value mono" style="color: var(--purple);" id="kpiDuziasTotal">0 dz</div>
       <div class="kpi-sub" id="kpiDuziasAteHoje">Até Data Base: 0 dz</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Horas Programadas</div>
+      <div class="kpi-label">Horas Prog.</div>
       <div class="kpi-value mono" style="color: var(--accent);" id="kpiHorasTotal">0,00 h</div>
       <div class="kpi-sub" id="kpiHorasAteHoje">Até Data Base: 0,00 h</div>
     </div>
+    <div class="kpi-card kpi-highlight">
+      <div class="kpi-label" style="color: #92400e;">Horas Pendentes</div>
+      <div class="kpi-value mono" style="color: var(--warning);" id="kpiHorasPendentes">0,00 h</div>
+      <div class="kpi-sub" id="kpiHorasPendSub">Saldo ÷ Cadh</div>
+    </div>
     <div class="kpi-card">
-      <div class="kpi-label">Realizado SAP (GMEIN)</div>
-      <div class="kpi-value mono" style="color: var(--info);" id="kpiRealizado">0</div>
-      <div class="kpi-sub" id="kpiAderencia">Aderência até data: 0%</div>
+      <div class="kpi-label">Realizado SAP</div>
+      <div class="kpi-value mono" style="color: var(--info);" id="kpiRealizado">0 cx</div>
+      <div class="kpi-sub" id="kpiAderencia">Relação vs Prog.: 0%</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Ordens Atrasadas</div>
       <div class="kpi-value mono" style="color: var(--danger);" id="kpiAtrasadas">0</div>
-      <div class="kpi-sub" id="kpiSaldoAtraso">Déficit acumulado: 0 cx</div>
+      <div class="kpi-sub" id="kpiSaldoAtraso">Déficit: 0 cx</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Ordens para Encerrar (100%)</div>
+      <div class="kpi-label">Para Encerrar</div>
       <div class="kpi-value mono" style="color: var(--success);" id="kpiEncerrar">0</div>
-      <div class="kpi-sub">Prontas para TECO no SAP</div>
+      <div class="kpi-sub">Prontas p/ TECO SAP</div>
     </div>
   </section>
 
@@ -719,6 +764,7 @@
           <th>Qtd Ordem SAP</th>
           <th>Dúzias Prev.</th>
           <th>Horas Prog.</th>
+          <th>Horas Pend.</th>
           <th>Realizado SAP</th>
           <th>Saldo Ordem</th>
           <th>% Ordem</th>
@@ -727,7 +773,7 @@
       </thead>
       <tbody id="tableBody">
         <tr>
-          <td colspan="13" class="empty-state">
+          <td colspan="14" class="empty-state">
             Importe a planilha do <strong>Plano de Produção</strong> e o <strong>Relatório SAP</strong> acima para iniciar o cruzamento.
           </td>
         </tr>

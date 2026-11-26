@@ -240,6 +240,7 @@ function processarArquivoPlano(file) {
         linha: headers.findIndex(h => h === 'linha'),
         data: headers.findIndex(h => h === 'data'),
         wo: headers.findIndex(h => h === 'wo'),
+        cadh: headers.findIndex(h => h === 'cadh' || h.includes('cadh') || h.includes('cadencia')),
         item: headers.findIndex(h => h === 'item'),
         obs: headers.findIndex(h => h.includes('observa')),
         qtd: headers.findIndex(h => h === 'qtd'),
@@ -267,7 +268,8 @@ function processarArquivoPlano(file) {
 
         const item = String(r[col.item] || '').trim();
         const qtd = parseNumber(r[col.qtd]);
-        const horas = col.horas >= 0 ? parseNumber(r[col.horas]) : 0;
+        const cadh = col.cadh >= 0 ? parseNumber(r[col.cadh]) : 0;
+        const horas = col.horas >= 0 ? parseNumber(r[col.horas]) : (cadh > 0 ? qtd / cadh : 0);
         const duzias = col.duzias >= 0 ? parseNumber(r[col.duzias]) : 0;
         const dataIso = parseExcelDate(r[col.data]) || 'SEM_DATA';
 
@@ -277,6 +279,7 @@ function processarArquivoPlano(file) {
           rowIndex: i + 1,
           bloco: blocoAtual,
           wo,
+          cadh,
           item,
           dataIso,
           obs: String(r[col.obs] || '').trim(),
@@ -614,7 +617,7 @@ async function initCloudSync() {
 }
 
 // =========================================================================
-// 6. MOTOR DE CRUZAMENTO USANDO "QUANTIDADE DA ORDEM (GMEIN)"
+// 6. MOTOR DE CRUZAMENTO USANDO "QUANTIDADE DA ORDEM (GMEIN)" E HORAS PENDENTES
 // =========================================================================
 function processAndRender() {
   if (rawPlanoRows.length === 0) return;
@@ -645,6 +648,7 @@ function processAndRender() {
         obs: row.obs,
         cliente: row.cliente,
         demanda: row.demanda,
+        cadh: row.cadh || 0,
         datas: [],
         progTotal: 0,
         progAteData: 0,
@@ -659,6 +663,7 @@ function processAndRender() {
     entry.progTotal += row.qtd;
     entry.duziasTotal += row.duzias;
     entry.horasTotal += row.horas;
+    if (!entry.cadh && row.cadh > 0) entry.cadh = row.cadh;
 
     if (row.dataIso !== 'SEM_DATA' && row.dataIso <= refDate) {
       entry.progAteData += row.qtd;
@@ -675,6 +680,7 @@ function processAndRender() {
   let totalDuziasPlano = 0;
   let totalHorasAteHoje = 0;
   let totalHorasPlano = 0;
+  let totalHorasPendentes = 0;
   let totalRealizado = 0;
   let deficitAtraso = 0;
 
@@ -689,6 +695,14 @@ function processAndRender() {
     const desc = (sapInfo && sapInfo.desc) ? sapInfo.desc : (ord.obs || ord.demanda || 'Sem descrição SAP');
     const saldo = Math.max(0, qtdOrdemAlvo - realizado);
     const pct = qtdOrdemAlvo > 0 ? Math.min(100, Math.round((realizado / qtdOrdemAlvo) * 100)) : 0;
+
+    // Cadência efetiva: usa a coluna Cadh do Excel ou deduz de (progTotal / horasTotal)
+    const cadhEfetiva = ord.cadh > 0
+      ? ord.cadh
+      : (ord.horasTotal > 0 ? (ord.progTotal / ord.horasTotal) : 0);
+
+    // Fórmula equivalente a =SEERRO(Saldo / Cadh; 0)
+    const horasPendentes = (saldo > 0 && cadhEfetiva > 0) ? (saldo / cadhEfetiva) : 0;
 
     const jaRealizadoAntesDoPlano = Math.max(0, qtdOrdemAlvo - ord.progTotal);
     const metaAcumuladaAteData = jaRealizadoAntesDoPlano + ord.progAteData;
@@ -718,10 +732,13 @@ function processAndRender() {
     totalDuziasPlano += ord.duziasTotal;
     totalHorasAteHoje += ord.horasAteData;
     totalHorasPlano += ord.horasTotal;
+    totalHorasPendentes += horasPendentes;
     totalRealizado += realizado;
 
     consolidatedOrders.push({
       ...ord,
+      cadhEfetiva,
+      horasPendentes,
       qtdOrdemAlvo,
       hasSapOrder,
       desc,
@@ -745,14 +762,18 @@ function processAndRender() {
   document.getElementById('kpiHorasTotal').textContent = `${totalHorasPlano.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h`;
   document.getElementById('kpiHorasAteHoje').textContent = `Até Data Base: ${totalHorasAteHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h`;
 
+  document.getElementById('kpiHorasPendentes').textContent = `${totalHorasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h`;
+  const ordensComSaldo = consolidatedOrders.filter(o => o.saldo > 0).length;
+  document.getElementById('kpiHorasPendSub').textContent = `${ordensComSaldo} ordens c/ saldo`;
+
   document.getElementById('kpiRealizado').textContent = `${totalRealizado.toLocaleString('pt-BR')} cx`;
   const aderencia = totalProgAteHoje > 0 ? Math.round((totalRealizado / totalProgAteHoje) * 100) : 0;
-  document.getElementById('kpiAderencia').textContent = `Relação vs Prog. Data: ${aderencia}%`;
+  document.getElementById('kpiAderencia').textContent = `Relação vs Prog.: ${aderencia}%`;
 
   const qtdAtrasadas = consolidatedOrders.filter(o => o.status === 'atrasadas').length;
   const qtdEncerrar = consolidatedOrders.filter(o => o.status === 'encerrar').length;
   document.getElementById('kpiAtrasadas').textContent = qtdAtrasadas;
-  document.getElementById('kpiSaldoAtraso').textContent = `Déficit acumulado: ${deficitAtraso.toLocaleString('pt-BR')} cx`;
+  document.getElementById('kpiSaldoAtraso').textContent = `Déficit: ${deficitAtraso.toLocaleString('pt-BR')} cx`;
   document.getElementById('kpiEncerrar').textContent = qtdEncerrar;
 
   document.getElementById('cntTodas').textContent = consolidatedOrders.length;
@@ -784,13 +805,19 @@ function renderTable() {
   if (consolidatedOrders.length > 0) {
     const somaCxFiltro = filtered.reduce((acc, o) => acc + o.progTotal, 0);
     const somaDzFiltro = filtered.reduce((acc, o) => acc + o.duziasTotal, 0);
-    counterEl.textContent = `${filtered.length} itens (${somaCxFiltro.toLocaleString('pt-BR')} cx • ${Math.round(somaDzFiltro).toLocaleString('pt-BR')} dz)`;
+    const somaHorasPendFiltro = filtered.reduce((acc, o) => acc + o.horasPendentes, 0);
+    counterEl.textContent = `${filtered.length} itens (${somaCxFiltro.toLocaleString('pt-BR')} cx • ${Math.round(somaDzFiltro).toLocaleString('pt-BR')} dz • ${somaHorasPendFiltro.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h pend.)`;
+
+    // Atualiza o card de Horas Pendentes dinamicamente conforme a aba/pesquisa ativa
+    document.getElementById('kpiHorasPendentes').textContent = `${somaHorasPendFiltro.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h`;
+    const qtdPendFiltro = filtered.filter(o => o.saldo > 0).length;
+    document.getElementById('kpiHorasPendSub').textContent = `${qtdPendFiltro} ordens c/ saldo`;
   } else {
     counterEl.textContent = '';
   }
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="13" class="empty-state">Nenhuma ordem ou artigo encontrado neste filtro.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="14" class="empty-state">Nenhuma ordem ou artigo encontrado neste filtro.</td></tr>`;
     return;
   }
 
@@ -811,6 +838,9 @@ function renderTable() {
     const sapOrdemCol = o.hasSapOrder
       ? `<span class="mono" style="${diffOrdemPlano ? 'color:var(--warning); font-weight:800;' : ''}">${o.qtdOrdemAlvo.toLocaleString('pt-BR')}</span>`
       : `<span style="color:var(--text-muted); font-size:0.76rem;">—</span>`;
+
+    const horasPendStyle = o.horasPendentes > 0 ? 'color:var(--warning); font-weight:800;' : 'color:var(--success);';
+    const cadhTooltip = o.cadhEfetiva > 0 ? `title="Cadh: ${Math.round(o.cadhEfetiva)} cx/h"` : '';
 
     const listaMotivos = o.notaPcp ? o.notaPcp.split(' | ').map(s => s.trim()).filter(Boolean) : [];
     const triggerClass = listaMotivos.length > 0 ? 'motivo-trigger has-note' : 'motivo-trigger';
@@ -836,6 +866,7 @@ function renderTable() {
         <td>${sapOrdemCol}</td>
         <td class="mono" style="color:var(--purple);">${Math.round(o.duziasTotal).toLocaleString('pt-BR')}</td>
         <td class="mono">${o.horasTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h</td>
+        <td class="mono" style="${horasPendStyle}" ${cadhTooltip}>${o.horasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h</td>
         <td class="mono" style="color:var(--info);">${o.realizado.toLocaleString('pt-BR')}</td>
         <td class="mono" style="color:${o.saldo > 0 ? 'var(--danger)' : 'var(--success)'};">${o.saldo.toLocaleString('pt-BR')}</td>
         <td>
@@ -895,8 +926,10 @@ function exportarExcel(tipo) {
     'Datas Programadas': o.datas.map(d => `${formatDateBR(d.dataIso)} (${d.qtd})`).join(' | '),
     'Programado no Plano (Cx)': o.progTotal,
     'Quantidade da Ordem SAP (GMEIN)': o.qtdOrdemAlvo,
+    'Cadh (Cx/h)': Math.round(o.cadhEfetiva),
     'Dúzias Previstas': Math.round(o.duziasTotal),
     'Horas Programadas': Number(o.horasTotal.toFixed(2)),
+    'Horas Pendentes': Number(o.horasPendentes.toFixed(2)),
     'Realizado SAP (GMEIN)': o.realizado,
     'Saldo Pendente Ordem (Cx)': o.saldo,
     '% Concluído Ordem': `${o.pct}%`,
